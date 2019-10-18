@@ -60,49 +60,59 @@ Your first task is to complete the 10 missing SQL queries in ’database.py’
 They are as follows:
 
 1. A user logs into the system by providing their username and password. Once logged in, they reach the landing page which displays:
-    2. User subscribed Podcasts
-    2. User Playlists
-    2. User current in-progress items
+
+    1. User subscribed Podcasts
+    1. User Playlists
+    1. User current in-progress items
 1. When a user clicks on a song, they should see all the song information, including:
-    2. Song Name
+
+    1. Song Name
     2. Song Artists
     2. Song length
     2. Song Metadata such as Artwork, description, Genres
 1. When a user clicks on the ’tv shows’ nav item, they should see a list of all tv shows information, including:
-    2. TV Show ID
+    
+    1. TV Show ID
     2. TV Show Name
     2. Total number of tv show episodes for this tv show
 1. When a user clicks on a single tv Show, they should see a list of relevant information, including:
-    2. TV Show Name
+
+    1. TV Show Name
     2. TV Show Metadata such as Artworks, Descriptions, Genres
     2. A list of every episode for this tv show ordered by Season and then Episode including:
-        3. TV Show Episode ID
+        
+        1. TV Show Episode ID
         3. TV Show Episode Title
         3. Season
         3. Episode
         3. AirDate
 1. When a user clicks on a single Album, they should see a list of relevant information, including:
-    2. Album Name
+
+    1. Album Name
     2. Album Metadata such as Artworks, Descriptions
     2. A list of all songs in an album ordered by track number including:
-        3. the song ID
+
+        1. the song ID
         3. the Song Name
         3. The Song Artist2.
 1. Users should also be able to see all the genres for an Album in part 2.. The Genres for an album are composed of all the Genres for it’s songs.
 1. When a user clicks on a single podcast from the ’podcasts’ list (or their subscribed podcasts), they should see a list of relevant information including:
-    2. Podcast ID
+
+    1. Podcast ID
     2. Podcast Name
     2. Podcast URI
     2. Last Updated
     2. Podcast Metadata such as Artworks, Descriptions, Genres
     2. A list of all podcast episodes in this podcast ordered by descending publication date including:
-        3. Podcast Episode ID
+
+        1. Podcast Episode ID
         3. Podcast Episode Title
         3. Podcast Episode URI
         3. Podcast Episode Date Published
         3. Podcast Episode Length
 1. When A user clicks on a single podcast episode from the list in part 7, they should see all relevant podcast episode information including:
-    2. Podcast Episode ID
+
+    1. Podcast Episode ID
     2. Podcast Episode Title
     2. Podcast Episode URI
     2. Podcast Episode Date Published
