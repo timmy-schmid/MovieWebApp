@@ -94,7 +94,7 @@ They are as follows:
 
         1. the song ID
         3. the Song Name
-        3. The Song Artist2.
+        3. The Song Artist(s)
 1. Users should also be able to see all the genres for an Album in part 2.. The Genres for an album are composed of all the Genres for it’s songs.
 1. When a user clicks on a single podcast from the ’podcasts’ list (or their subscribed podcasts), they should see a list of relevant information including:
 
@@ -156,4 +156,3 @@ flow.
 1. Create a new template(s) in 'templates/*.html'.
 1. Add new Menu items to 'templates/top.html' or links in other existing files to
 access your new routes
-
