@@ -1,5 +1,5 @@
 /**
-ISYS2120 2019 S2 Assignment 03 Media Server Database
+ISYS2120 2020 S2 Assignment 03 Media Server Database
 Prepared by: Ryan Skelton, Harshana Randeni
 
 You should only need to alter the Helper functions at the bottom of the file
@@ -46,8 +46,8 @@ DROP TABLE IF EXISTS PodcastMetaData CASCADE;
 
 CREATE TABLE UserAccount (
     username VARCHAR(50) PRIMARY KEY,
-    password VARCHAR(100),
-    isSuper boolean
+    password VARCHAR(72) NOT NULL,
+    isSuper boolean DEFAULT FALSE 
 );
 
 CREATE TABLE ContactType(
@@ -250,7 +250,6 @@ CREATE TABLE PodcastMetaData (
 -- Function to add a movie with some associated metadata
 -- Call it using 'Select addmovie([paramaters]);'
 -- Example: SELECT mediaserver.addMovie('Empty storage location','Empty description field','Empty Film Value','0','drama');
--- works through pgAdmin, not working thru pg8000 (but was at some point)
 
 create or replace function mediaserver.addmovie(
 	location text,
@@ -299,7 +298,7 @@ LANGUAGE sql;
 -- Function to add a song with some associated metadata
 -- Call it using 'Select addsong([paramaters]);'
 -- Example: SELECT mediaserver.addSong('no location','no description','Empty Song','0','pop','33');
--- works through pgAdmin, not working thru pg8000 (but was at some point)
+-- TODO :: Part 9, handle the proper insertion of a song
 create or replace function mediaserver.addSong(
 	location text,
 	songdescription text,
@@ -309,42 +308,26 @@ create or replace function mediaserver.addSong(
     artistid int)
 RETURNS int AS
 $BODY$
-WITH ins1 AS (
-        INSERT INTO mediaserver.mediaItem(storage_location)
-        VALUES (location)
-        RETURNING media_id
-        )
-        , ins2 AS (
-        INSERT INTO mediaserver.metadata (md_type_id,md_value)
-        SELECT md_type_id, songdescription
-        FROM mediaserver.MetaDataType where md_type_name = 'description'
-        RETURNING md_id
-        )
-        , ins3 AS (
-        INSERT INTO mediaserver.AudioMedia
-        SELECT media_id FROM ins1
-        )
-        ,ins4 AS (
-        INSERT INTO mediaserver.Song
-        SELECT media_id, title, songlength FROM ins1
-        )
-        ,ins5 AS (
-        INSERT INTO mediaserver.metadata (md_type_id,md_value)
-        SELECT md_type_id, songgenre
-        FROM mediaserver.MetaDataType where md_type_name = 'song genre'
-        RETURNING md_id as genre_md_id
-        )
-        ,ins6 AS (
-        INSERT INTO mediaserver.MediaItemMetaData
-        SELECT media_id, genre_md_id FROM ins1, ins5
-        )
-        ,ins7 AS (
-        INSERT INTO mediaserver.Song_Artists
-        SELECT media_id, artistid FROM ins1
-        )
-        INSERT INTO mediaserver.MediaItemMetaData
-        SELECT media_id, md_id FROM ins1, ins2;
-
-        SELECT max(song_id) as song_id FROM mediaserver.song;
+    SELECT -1;
 $BODY$
 LANGUAGE sql;
+
+
+-- Insert password with more secure storage
+-- to check the password:
+--      select * 
+--      from mediaserver.useraccount 
+--      where username = 'whatevertheuseris' and password = public.crypt('whateverthepasswordis',password);
+CREATE OR REPLACE FUNCTION mediaserver.storeSecurePassword(
+    username VARCHAR(50),
+    password VARCHAR(100))
+RETURNS void AS
+$$
+    DECLARE
+        -- you would have any variables declared here
+    BEGIN
+		INSERT INTO mediaserver.UserAccount (username, password) VALUES
+  			(lower(username), public.crypt(password, public.gen_salt('bf', 8)));
+    END;
+$$
+LANGUAGE plpgsql;
