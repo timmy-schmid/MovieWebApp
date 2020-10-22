@@ -19,7 +19,7 @@ various audio and video media.
 
 ![ERD](ISYS2120_a3_erd.png)
 
-As per the schema in Assignment 01, you have various consumable media:
+As per the above schema you have various consumable media:
 
 1. Movies
 1. TV Shows (which have TV Episodes)
@@ -35,7 +35,7 @@ including:
 1. Consumed media
 
 We have abstracted most of the common elements such descriptions, artwork and genres
-into a new MetaData table system. The primary Metadata table contains 3 fields:
+into a MetaData table system. The primary Metadata table contains 3 fields:
 
 1. an ID field (which other tables use a FK)
 1. a MetaData type ID field (which maps to the MetaDataType table)
