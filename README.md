@@ -1,10 +1,10 @@
-# 2020 S2 ISYS2120 - DB Application Programming Assignment
+# 2021 S2 ISYS2120 - DB Application Programming Assignment
 
 Welcome to assignment 03 for ISYS2120.
 
 This is the code base that you must modify for the purposes of the assignment.
 
-Please look at the specification [file](isys2120_20s2_a03_specification.pdf) to see the full details regarding what you need to do for this assessment.
+Please look at the specification [file](isys2120_21s2_a03_specification.pdf) to see the full details regarding what you need to do for this assessment.
 
 You will have to mainly have to modify 2 files: routes.py and database.py
 
@@ -90,12 +90,13 @@ They are as follows:
 
     1. Album Name
     2. Album Metadata such as Artworks, Descriptions
+    2. All genres for this Album. The Genres for an album are composed of all the Genres for all it’s songs.
     2. A list of all songs in an album ordered by track number including:
 
         1. the song ID
         3. the Song Name
         3. The Song Artist(s)
-1. Users should also be able to see all the genres for an Album in part 2.. The Genres for an album are composed of all the Genres for it’s songs.
+        
 1. When a user clicks on a single podcast from the ’podcasts’ list (or their subscribed podcasts), they should see a list of relevant information including:
 
     1. Podcast ID
@@ -120,6 +121,7 @@ They are as follows:
     2. Podcast Episode Metadata such as Artworks, Descriptions, Genres
 1. Write the SQL to ensure the proper insert of a new Song, including valid artist checks and appropriate MetaData inserts. You may need to complete the function addSong() in the schema.sql file and reload the schema.sql file (or just run just that create statement)
 1. Write SQL for getting all relevant details for searching through all movies by title
+1. <Placeholder> 
 
 #### Data handling tasks
 
