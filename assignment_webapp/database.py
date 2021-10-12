@@ -253,7 +253,7 @@ def user_playlists(username):
     return None
 
 #####################################################
-#   Query (1 c)
+#   Query (1 a)
 #   Get user podcasts
 #####################################################
 def user_podcast_subscriptions(username):
@@ -680,7 +680,7 @@ def get_song_metadata(song_id):
     return None
 
 #####################################################
-#   Query (7 a,b,c,d,e)
+#   Query (6 a,b,c,d,e)
 #   Get one podcast and return all metadata associated with it
 #####################################################
 def get_podcast(podcast_id):
@@ -719,7 +719,7 @@ def get_podcast(podcast_id):
     return None
 
 #####################################################
-#   Query (7 f)
+#   Query (6 f)
 #   Get all podcast eps for one podcast
 #####################################################
 def get_all_podcasteps_for_podcast(podcast_id):
@@ -760,7 +760,7 @@ def get_all_podcasteps_for_podcast(podcast_id):
 
 
 #####################################################
-#   Query (8 a,b,c,d,e,f)
+#   Query (7 a,b,c,d,e,f)
 #   Get one podcast ep and associated metadata
 #####################################################
 def get_podcastep(podcastep_id):
@@ -840,7 +840,7 @@ def get_album(album_id):
 
 
 #####################################################
-#   Query (5 c)
+#   Query (5 d)
 #   Get all songs for one album
 #####################################################
 def get_album_songs(album_id):
@@ -880,7 +880,7 @@ def get_album_songs(album_id):
 
 
 #####################################################
-#   Query (6)
+#   Query (5 c)
 #   Get all genres for one album
 #####################################################
 def get_album_genres(album_id):
@@ -917,6 +917,130 @@ def get_album_genres(album_id):
     cur.close()                     # Close the cursor
     conn.close()                    # Close the connection to the db
     return None
+
+#####################################################
+#   Query (10)
+#   May require the addition of SQL to multiple 
+#   functions and the creation of a new function to
+#   determine what type of genre is being provided
+#   You may have to look at the hard coded values
+#   in the sampledata to make your choices
+#####################################################
+
+#####################################################
+#   Query (10)
+#   Get all songs for one song_genre
+#####################################################
+def get_genre_songs(genre_id):
+    """
+    Get all songs for a particular song_genre ID in your media server
+    """
+    conn = database_connect()
+    if(conn is None):
+        return None
+    cur = conn.cursor()
+    try:
+        #########
+        # TODO  #  
+        #########
+
+        #############################################################################
+        # Fill in the SQL below with a query to get all information about all       #
+        # songs which belong to a particular genre_id                               #
+        #############################################################################
+        sql = """
+        """
+
+        r = dictfetchall(cur,sql,(genre_id,))
+        print("return val is:")
+        print(r)
+        cur.close()                     # Close the cursor
+        conn.close()                    # Close the connection to the db
+        return r
+    except:
+        # If there were any errors, return a NULL row printing an error to the debug
+        print("Unexpected error getting Songs with Genre ID: "+genre_id, sys.exc_info()[0])
+        raise
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return None
+
+#####################################################
+#   Query (10)
+#   Get all podcasts for one podcast_genre
+#####################################################
+def get_genre_podcasts(genre_id):
+    """
+    Get all podcasts for a particular podcast_genre ID in your media server
+    """
+    conn = database_connect()
+    if(conn is None):
+        return None
+    cur = conn.cursor()
+    try:
+        #########
+        # TODO  #  
+        #########
+
+        #############################################################################
+        # Fill in the SQL below with a query to get all information about all       #
+        # podcasts which belong to a particular genre_id                            #
+        #############################################################################
+        sql = """
+        """
+
+        r = dictfetchall(cur,sql,(genre_id,))
+        print("return val is:")
+        print(r)
+        cur.close()                     # Close the cursor
+        conn.close()                    # Close the connection to the db
+        return r
+    except:
+        # If there were any errors, return a NULL row printing an error to the debug
+        print("Unexpected error getting Podcasts with Genre ID: "+genre_id, sys.exc_info()[0])
+        raise
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return None
+
+#####################################################
+#   Query (10)
+#   Get all movies and tv shows for one film_genre
+#####################################################
+def get_genre_movies_and_shows(genre_id):
+    """
+    Get all movies and tv shows for a particular film_genre ID in your media server
+    """
+    conn = database_connect()
+    if(conn is None):
+        return None
+    cur = conn.cursor()
+    try:
+        #########
+        # TODO  #  
+        #########
+
+        #############################################################################
+        # Fill in the SQL below with a query to get all information about all       #
+        # movies and tv shows which belong to a particular genre_id                 #
+        #############################################################################
+        sql = """
+        """
+
+        r = dictfetchall(cur,sql,(genre_id,))
+        print("return val is:")
+        print(r)
+        cur.close()                     # Close the cursor
+        conn.close()                    # Close the connection to the db
+        return r
+    except:
+        # If there were any errors, return a NULL row printing an error to the debug
+        print("Unexpected error getting Movies and tv shows with Genre ID: "+genre_id, sys.exc_info()[0])
+        raise
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return None
+
 
 
 #####################################################
@@ -1113,7 +1237,7 @@ def find_matchingtvshows(searchterm):
 
 
 #####################################################
-#   Query (10)
+#   Query (9)
 #   Find all matching Movies
 #####################################################
 def find_matchingmovies(searchterm):
@@ -1189,7 +1313,7 @@ def add_movie_to_db(title,release_year,description,storage_location,genre):
     return None
 
 #####################################################
-#   Query (9)
+#   Query (8)
 #   Add a new Song
 #####################################################
 def add_song_to_db(song_params):

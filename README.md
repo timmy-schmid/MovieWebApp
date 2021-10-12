@@ -121,11 +121,15 @@ They are as follows:
     2. Podcast Episode Metadata such as Artworks, Descriptions, Genres
 1. Write the SQL to ensure the proper insert of a new Song, including valid artist checks and appropriate MetaData inserts. You may need to complete the function addSong() in the schema.sql file and reload the schema.sql file (or just run just that create statement)
 1. Write SQL for getting all relevant details for searching through all movies by title
-1. <Placeholder> 
-
+1. When a user clicks on a single genre, they should see all appropriate items that are associated with that genre (Movies and TV Shows for 'film genre'; Songs for 'song genre'; and Podcasts for 'podcast genre'). Each item listed should include the following:
+    
+    1. Item ID
+    1. Item Title
+    1. Item Type (Movie / Tv Show / Song / Podcast)
+    
 #### Data handling tasks
 
-Your second task set is to complete the data handling for the last 4 SQL tasks from above.
+Your second task set is to complete the data handling for the last 5 SQL tasks from above.
 
 You must complete the following functions in ’routes.py’:
 
@@ -133,20 +137,22 @@ You must complete the following functions in ’routes.py’:
 1. single_podcastep()
 1. add_song()
 1. search_movies()
+1. single_genre()
 
 You can write as many helper functions to assist you as you wish, just remember to
 document them in your report.
 
 #### Data Representation tasks
 
-Your third task set is to complete the data representation for the last 4 tasks in the SQL tasks.
+Your third task set is to complete the data representation for the last 5 tasks in the SQL tasks.
 
 You must complete the following files in the 'templates' folder:
 
 1. 'templates/singleitems/podcast.html'
 1. 'templates/singleitems/podcastep.html'
 1. 'templates/createitems/createsong.html'
-1. 'templates/searchitems/search movies.html’ and add a link to ’templates/top.html’ enabling the drop-down option to search by movies
+1. 'templates/searchitems/search_movies.html’ and add a link to ’templates/top.html’ enabling the drop-down option to search by movies
+1. 'templates/singleitems/genres.html' and add clickability to all genres in 'templates/singleitems/podcast.html', 'templates/singleitems/song.html', 'templates/singleitems/tvshow.html', 'templates/singleitems/movie.html'
 
 #### New functionality
 
@@ -156,5 +162,4 @@ Your fourth task is to create a new functionality. This will usually involve the
 flow.
 1. Create a new function(s) in 'database.py' or new functions in SQL.
 1. Create a new template(s) in 'templates/*.html'.
-1. Add new Menu items to 'templates/top.html' or links in other existing files to
-access your new routes
+1. Add new Menu items to 'templates/top.html' or links in other existing files to access your new routes

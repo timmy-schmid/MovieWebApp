@@ -403,7 +403,7 @@ def single_song(song_id):
                            songmetadata=songmetadata)
 
 #####################################################
-#   Query 6
+#   Query (6)
 #   Individual Podcast
 #####################################################
 @app.route('/podcast/<podcast_id>')
@@ -433,7 +433,7 @@ def single_podcast(podcast_id):
                            user=user_details)
 
 #####################################################
-#   Query 7
+#   Query (7)
 #   Individual Podcast Episode
 #####################################################
 @app.route('/podcastep/<media_id>')
@@ -606,6 +606,51 @@ def single_tvshowep(tvshowep_id):
                            user=user_details,
                            tvshowep=tvshowep)
 
+#####################################################
+#   Query (10)
+#   Individual Genre
+#####################################################
+@app.route('/genre/<genre_id>')
+def single_genre(genre_id):
+    """
+    Show a single genre in your media server
+    First, figure out what type of genre this is
+    Then list all items that have that genre:
+    1. Song Genre
+        a. list all songs
+    2. Film Genre
+        a. list all tv shows and films
+    3. Postcast Genre
+        a. list all podcasts
+    Can do this without a login
+    """
+    # # Check if the user is logged in, if not: back to login.
+    # if('logged_in' not in session or not session['logged_in']):
+    #     return redirect(url_for('login'))
+
+    #########
+    # TODO  #  
+    #########
+
+    #############################################################################
+    # Fill in the Function below with to do all data handling for a genre       #
+    #############################################################################
+
+    page['title'] = '' # Add the title
+
+    # Identify the type of genre - you may need to add a new function to database.py to do this
+
+    # Set up some variables to manage the returns from the database functions
+    #   There are some function frameworks provided for you to do this.
+    
+    # Once retrieved, do some data integrity checks on the data
+
+    # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
+    return render_template('singleitems/genre.html',
+                           session=session,
+                           page=page,
+                           user=user_details)
+
 
 #####################################################
 #####################################################
@@ -651,7 +696,7 @@ def search_tvshows():
                            tvshows=tvshows)
 
 #####################################################
-#   Query 10
+#   Query (9)
 #   Search Movie
 #####################################################
 @app.route('/search/movie', methods=['POST','GET'])
@@ -775,7 +820,7 @@ def add_movie():
 
 
 #####################################################
-#   Query 9
+#   Query (8)
 #   Add song
 #####################################################
 @app.route('/add/song', methods=['POST','GET'])
