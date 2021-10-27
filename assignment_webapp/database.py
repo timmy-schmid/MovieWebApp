@@ -154,12 +154,12 @@ def check_login(username, password):
         #############################################################################
 
         sql = """
-        
-        
+        SELECT * FROM mediaserver.UserAccount WHERE username=%s AND password=%s
         """
+        print(sql)
         print(username)
         print(password)
-
+        
         r = dictfetchone(cur,sql,(username,password))
         print(r)
         cur.close()                     # Close the cursor
@@ -233,7 +233,11 @@ def user_playlists(username):
         # Fill in the SQL below and make sure you get all the playlists for this user #
         ###############################################################################
         sql = """
-        
+SELECT	MC.collection_id, MC.collection_name, count(MC.collection_id)
+FROM	mediaserver.mediacollection MC NATURAL JOIN mediaserver.mediacollectioncontents MCC
+WHERE	MC.username = %s
+GROUP BY MC.collection_id, MC.collection_name
+ORDER BY MC.collection_id;
         """
 
 
@@ -275,6 +279,10 @@ def user_podcast_subscriptions(username):
         #################################################################################
 
         sql = """
+SELECT	PD.podcast_id, PD.podcast_title, PD.podcast_uri, PD.podcast_last_updated
+FROM	mediaserver.subscribed_podcasts SP NATURAL JOIN mediaserver.podcast PD
+WHERE	SP.username = %s
+ORDER BY PD.podcast_id;
         """
 
 
@@ -314,7 +322,11 @@ def user_in_progress_items(username):
         ###################################################################################
 
         sql = """
-
+SELECT	MC.media_id, MC.play_count, MC.progress, MC.lastviewed, MI.storage_location
+FROM	mediaserver.usermediaconsumption MC NATURAL JOIN mediaserver.mediaitem MI
+WHERE	MC.username = %s AND
+		MC.progress != 100.00
+ORDER BY MC.media_id;
         """
 
         r = dictfetchall(cur,sql,(username,))
@@ -513,6 +525,10 @@ def get_alltvshows():
         # Fill in the SQL below with a query to get all tv shows and episode counts #
         #############################################################################
         sql = """
+SELECT	tvshow_id, tvshow_title, count(tvshow_id)
+FROM	mediaserver.tvshow NATURAL JOIN mediaserver.tvepisode
+GROUP BY tvshow_id, tvshow_title
+ORDER BY tvshow_id;
         """
 
         r = dictfetchall(cur,sql)
@@ -624,6 +640,9 @@ def get_song(song_id):
         # and the artists that performed it                                         #
         #############################################################################
         sql = """
+SELECT	S.song_title, S.length, ART.artist_name
+FROM	mediaserver.song S NATURAL JOIN mediaserver.song_artists SA NATURAL JOIN mediaserver.artist ART
+WHERE	S.song_id = %s;
         """
 
         r = dictfetchall(cur,sql,(song_id,))
@@ -663,6 +682,10 @@ def get_song_metadata(song_id):
         #############################################################################
 
         sql = """
+SELECT	S.song_title, md_type_name, md_value
+FROM 	(mediaserver.mediaitemmetadata MI JOIN mediaserver.song S ON (MI.media_id = S.song_id))
+		NATURAL JOIN mediaserver.metadatatype NATURAL JOIN mediaserver.metadata
+WHERE	S.song_id = %s;
         """
 
         r = dictfetchall(cur,sql,(song_id,))
@@ -1066,6 +1089,10 @@ def get_tvshow(tvshow_id):
         # including all relevant metadata       #
         #############################################################################
         sql = """
+SELECT	tvshow_title, md_type_name, md_value
+FROM	(mediaserver.tvshow NATURAL JOIN mediaserver.tvshowmetadata) 
+		NATURAL JOIN mediaserver.metadatatype NATURAL JOIN mediaserver.metadata
+WHERE	tvshow_id = %s;
         """
 
         r = dictfetchall(cur,sql,(tvshow_id,))
@@ -1106,6 +1133,9 @@ def get_all_tvshoweps_for_tvshow(tvshow_id):
         # tv episodes in a tv show                                                  #
         #############################################################################
         sql = """
+SELECT	media_id, tvshow_episode_title, season, episode, air_date
+FROM	mediaserver.tvepisode
+WHERE	tvshow_id = %s;
         """
 
         r = dictfetchall(cur,sql,(tvshow_id,))
