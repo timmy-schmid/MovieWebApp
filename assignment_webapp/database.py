@@ -950,6 +950,28 @@ def get_album_genres(album_id):
 #   in the sampledata to make your choices
 #####################################################
 
+def get_genre_type(genre_id): ##Helper function
+  conn = database_connect()
+  if(conn is None):
+    return None
+  cur = conn.cursor()
+  try:
+    sql = """
+            SELECT DISTINCT MT.md_type_name
+            FROM mediaserver.metadata MD NATURAL JOIN mediaserver.metadatatype MT
+            WHERE MD.md_value = %s;
+          """
+    r = dictfetchone(cur,sql,genre_id)
+    print("return val is:")
+    print(r)
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return r
+  except:
+    # If there were any errors, return a NULL row printing an error to the debug
+    print("Unexpected error getting Songs with Genre ID: "+ genre_id, sys.exc_info()[0])
+    raise
+
 #####################################################
 #   Query (10)
 #   Get all songs for one song_genre
@@ -963,16 +985,14 @@ def get_genre_songs(genre_id):
         return None
     cur = conn.cursor()
     try:
-        #########
-        # TODO  #  
-        #########
-
-        #############################################################################
-        # Fill in the SQL below with a query to get all information about all       #
-        # songs which belong to a particular genre_id                               #
-        #############################################################################
         sql = """
-        """
+                SELECT s.song_id AS item_id, s.song_title AS item_title, 'song' as media_type
+                FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
+	                NATURAL JOIN mediaserver.metadatatype
+	                NATURAL JOIN mediaserver.metadata MD
+                WHERE MD.md_value = %s
+                ORDER BY s.song_id;
+              """
 
         r = dictfetchall(cur,sql,(genre_id,))
         print("return val is:")
@@ -984,9 +1004,6 @@ def get_genre_songs(genre_id):
         # If there were any errors, return a NULL row printing an error to the debug
         print("Unexpected error getting Songs with Genre ID: "+genre_id, sys.exc_info()[0])
         raise
-    cur.close()                     # Close the cursor
-    conn.close()                    # Close the connection to the db
-    return None
 
 #####################################################
 #   Query (10)
@@ -1289,7 +1306,11 @@ def find_matchingmovies(searchterm):
         # that match a given search term                                            #
         #############################################################################
         sql = """
-        """
+                SELECT m.*
+                FROM mediaserver.movie m 
+                WHERE movie_title ~* %s
+                ORDER BY m.movie_id;
+              """
 
         r = dictfetchall(cur,sql,(searchterm,))
         print("return val is:")
