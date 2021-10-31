@@ -728,6 +728,10 @@ def get_podcast(podcast_id):
         # including all metadata associated with it                                 #
         #############################################################################
         sql = """
+        SELECT PC.podcast_id, PC.podcast_title, PC.podcast_uri, PC.podcast_last_updated, MDT.md_type_name, MD.md_value
+        FROM mediaserver.Podcast PC NATURAL JOIN mediaserver.PodcastMetaData PMD 
+	        JOIN mediaserver.MetaData MD using (md_id) JOIN mediaserver.MetaDataType MDT using (md_type_id)
+        WHERE PC.podcast_id = %s;
         """
 
         r = dictfetchall(cur,sql,(podcast_id,))
@@ -768,6 +772,10 @@ def get_all_podcasteps_for_podcast(podcast_id):
         #############################################################################
         
         sql = """
+        SELECT PCE.podcast_id, PCE.media_id, PCE.podcast_episode_title, PCE.podcast_episode_URI, PCE.podcast_episode_published_date, PCE.podcast_episode_length
+        FROM mediaserver.PodcastEpisode PCE
+        WHERE PCE.podcast_id = %s
+        ORDER BY PCE.podcast_episode_published_date DESC;
         """
 
         r = dictfetchall(cur,sql,(podcast_id,))
@@ -848,6 +856,10 @@ def get_album(album_id):
         # including all relevant metadata                                           #
         #############################################################################
         sql = """
+        SELECT	album_title, md_type_name, md_value
+        FROM	mediaserver.Album Al NATURAL JOIN mediaserver.AlbumMetaData 
+                NATURAL JOIN mediaserver.metadata NATURAL JOIN mediaserver.MetaDataType
+        WHERE Al.album_id = %s;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
@@ -888,6 +900,12 @@ def get_album_songs(album_id):
         # songs in an album, including their artists                                #
         #############################################################################
         sql = """
+        SELECT S.song_id as "Song ID", S.song_title as "Song Name", string_agg(Ar.artist_name, ', ') as "Song Artist(s)"
+        FROM mediaserver.Album Al NATURAL JOIN mediaserver.Album_Songs Als NATURAL JOIN mediaserver.Song S 
+            NATURAL JOIN mediaserver.Song_Artists SA INNER JOIN mediaserver.Artist Ar on SA.performing_artist_id = Ar.artist_id
+        WHERE Al.album_id = %s
+        GROUP BY S.song_id, S.song_title, Als.track_num
+        ORDER BY Als.track_num;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
@@ -928,6 +946,10 @@ def get_album_genres(album_id):
         # genres in an album (based on all the genres of the songs in that album)   #
         #############################################################################
         sql = """
+        SELECT Distinct MD.md_value as Genre
+        FROM mediaserver.Album AL NATURAL JOIN mediaserver.Album_Songs ALS NATURAL JOIN mediaserver.Song S JOIN mediaserver.MediaItemMetaData MIMD ON (S.song_id = MIMD.media_id) 
+            NATURAL JOIN mediaserver.MetaData MD NATURAL JOIN mediaserver.MetaDataType MDT
+        WHERE AL.album_id = %s;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
@@ -953,6 +975,28 @@ def get_album_genres(album_id):
 #   in the sampledata to make your choices
 #####################################################
 
+def get_genre_type(genre_id): ##Helper function
+  conn = database_connect()
+  if(conn is None):
+    return None
+  cur = conn.cursor()
+  try:
+    sql = """
+            SELECT DISTINCT MT.md_type_name
+            FROM mediaserver.metadata MD NATURAL JOIN mediaserver.metadatatype MT
+            WHERE MD.md_value = %s;
+          """
+    r = dictfetchone(cur,sql,genre_id)
+    print("return val is:")
+    print(r)
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return r
+  except:
+    # If there were any errors, return a NULL row printing an error to the debug
+    print("Unexpected error getting Songs with Genre ID: "+ genre_id, sys.exc_info()[0])
+    raise
+
 #####################################################
 #   Query (10)
 #   Get all songs for one song_genre
@@ -966,16 +1010,14 @@ def get_genre_songs(genre_id):
         return None
     cur = conn.cursor()
     try:
-        #########
-        # TODO  #  
-        #########
-
-        #############################################################################
-        # Fill in the SQL below with a query to get all information about all       #
-        # songs which belong to a particular genre_id                               #
-        #############################################################################
         sql = """
-        """
+                SELECT s.song_id AS item_id, s.song_title AS item_title, 'song' as media_type
+                FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
+	                NATURAL JOIN mediaserver.metadatatype
+	                NATURAL JOIN mediaserver.metadata MD
+                WHERE MD.md_value = %s
+                ORDER BY s.song_id;
+              """
 
         r = dictfetchall(cur,sql,(genre_id,))
         print("return val is:")
@@ -987,9 +1029,6 @@ def get_genre_songs(genre_id):
         # If there were any errors, return a NULL row printing an error to the debug
         print("Unexpected error getting Songs with Genre ID: "+genre_id, sys.exc_info()[0])
         raise
-    cur.close()                     # Close the cursor
-    conn.close()                    # Close the connection to the db
-    return None
 
 #####################################################
 #   Query (10)
@@ -1292,7 +1331,11 @@ def find_matchingmovies(searchterm):
         # that match a given search term                                            #
         #############################################################################
         sql = """
-        """
+                SELECT m.*
+                FROM mediaserver.movie m 
+                WHERE movie_title ~* %s
+                ORDER BY m.movie_id;
+              """
 
         r = dictfetchall(cur,sql,(searchterm,))
         print("return val is:")
