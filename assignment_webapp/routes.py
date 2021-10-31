@@ -612,6 +612,7 @@ def single_tvshowep(tvshowep_id):
 #####################################################
 @app.route('/genre/<genre_id>')
 def single_genre(genre_id):
+
     """
     Show a single genre in your media server
     First, figure out what type of genre this is
@@ -624,6 +625,7 @@ def single_genre(genre_id):
         a. list all podcasts
     Can do this without a login
     """
+
     # # Check if the user is logged in, if not: back to login.
     # if('logged_in' not in session or not session['logged_in']):
     #     return redirect(url_for('login'))
@@ -636,20 +638,32 @@ def single_genre(genre_id):
     # Fill in the Function below with to do all data handling for a genre       #
     #############################################################################
 
-    page['title'] = '' # Add the title
+    page['title'] = 'Genre'
 
-    # Identify the type of genre - you may need to add a new function to database.py to do this
+    # Identify the type of genre and load items from db
+    type = database.get_genre_type(genre_id)
+    if type == 'song genre':
+      items = database.get_genre_songs(genre_id)
+    elif type == 'film genre':
+      items = database.get_genre_movies_and_shows(genre_id)
+    elif type == 'podcast genre':
+      items = database.get_genre_podcasts(genre_id)
+    else:
+      items = []
 
-    # Set up some variables to manage the returns from the database functions
-    #   There are some function frameworks provided for you to do this.
-    
-    # Once retrieved, do some data integrity checks on the data
+    #data integrity check
+    if items == None:
+      items = []
+    if type == None:
+      type = []
 
-    # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
     return render_template('singleitems/genre.html',
                            session=session,
                            page=page,
-                           user=user_details)
+                           user=user_details,
+                           items=items,
+                           type=type,
+                           genre=genre_id)
 
 
 #####################################################

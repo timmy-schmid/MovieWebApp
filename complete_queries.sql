@@ -126,14 +126,18 @@ WHERE movie_title ~* %s
 ORDER BY m.movie_id;
 
 --Q10 - Get all songs for one song_genre
-SELECT s.song_id, s.song_title, string_agg(saa.artist_name,',') as media_type
-from mediaserver.song s left outer join 
-            (mediaserver.Song_Artists sa join
-			 	mediaserver.Artist a on (sa.performing_artist_id=a.artist_id))
-				as saa  on (s.song_id=saa.song_id)
-group by s.song_id, s.song_title
-order by s.song_id
 
+SELECT DISTINCT MT.md_type_name
+FROM mediaserver.metadata MD NATURAL JOIN mediaserver.metadatatype MT
+WHERE MD.md_value = 'rock';
+
+
+SELECT s.song_id as item_id, s.song_title as item_title, 'song' as media_type
+FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
+	NATURAL JOIN mediaserver.metadatatype
+	NATURAL JOIN mediaserver.metadata MD
+WHERE MD.md_value ='rock'
+ORDER BY s.song_id;
 
 --Q10 - Get all podcasts for one podcast_genre
 --Q10 - Get all movies and tv shows for one film_genre
