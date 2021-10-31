@@ -725,6 +725,10 @@ def get_podcast(podcast_id):
         # including all metadata associated with it                                 #
         #############################################################################
         sql = """
+        SELECT PC.podcast_id, PC.podcast_title, PC.podcast_uri, PC.podcast_last_updated, MDT.md_type_name, MD.md_value
+        FROM mediaserver.Podcast PC NATURAL JOIN mediaserver.PodcastMetaData PMD 
+	        JOIN mediaserver.MetaData MD using (md_id) JOIN mediaserver.MetaDataType MDT using (md_type_id)
+        WHERE PC.podcast_id = %s;
         """
 
         r = dictfetchall(cur,sql,(podcast_id,))
@@ -765,6 +769,10 @@ def get_all_podcasteps_for_podcast(podcast_id):
         #############################################################################
         
         sql = """
+        SELECT PCE.podcast_id, PCE.media_id, PCE.podcast_episode_title, PCE.podcast_episode_URI, PCE.podcast_episode_published_date, PCE.podcast_episode_length
+        FROM mediaserver.PodcastEpisode PCE
+        WHERE PCE.podcast_id = %s
+        ORDER BY PCE.podcast_episode_published_date DESC;
         """
 
         r = dictfetchall(cur,sql,(podcast_id,))
@@ -845,6 +853,10 @@ def get_album(album_id):
         # including all relevant metadata                                           #
         #############################################################################
         sql = """
+        SELECT	album_title, md_type_name, md_value
+        FROM	mediaserver.Album Al NATURAL JOIN mediaserver.AlbumMetaData 
+                NATURAL JOIN mediaserver.metadata NATURAL JOIN mediaserver.MetaDataType
+        WHERE Al.album_id = %s;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
@@ -885,6 +897,12 @@ def get_album_songs(album_id):
         # songs in an album, including their artists                                #
         #############################################################################
         sql = """
+        SELECT S.song_id as "Song ID", S.song_title as "Song Name", string_agg(Ar.artist_name, ', ') as "Song Artist(s)"
+        FROM mediaserver.Album Al NATURAL JOIN mediaserver.Album_Songs Als NATURAL JOIN mediaserver.Song S 
+            NATURAL JOIN mediaserver.Song_Artists SA INNER JOIN mediaserver.Artist Ar on SA.performing_artist_id = Ar.artist_id
+        WHERE Al.album_id = %s
+        GROUP BY S.song_id, S.song_title, Als.track_num
+        ORDER BY Als.track_num;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
@@ -925,6 +943,10 @@ def get_album_genres(album_id):
         # genres in an album (based on all the genres of the songs in that album)   #
         #############################################################################
         sql = """
+        SELECT Distinct MD.md_value as Genre
+        FROM mediaserver.Album AL NATURAL JOIN mediaserver.Album_Songs ALS NATURAL JOIN mediaserver.Song S JOIN mediaserver.MediaItemMetaData MIMD ON (S.song_id = MIMD.media_id) 
+            NATURAL JOIN mediaserver.MetaData MD NATURAL JOIN mediaserver.MetaDataType MDT
+        WHERE AL.album_id = %s;
         """
 
         r = dictfetchall(cur,sql,(album_id,))
