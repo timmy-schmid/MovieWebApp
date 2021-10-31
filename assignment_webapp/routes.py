@@ -708,36 +708,28 @@ def search_movies():
     if('logged_in' not in session or not session['logged_in']):
         return redirect(url_for('login'))
 
-    #########
-    # TODO  #  
-    #########
+    page['title'] = 'Movie Search'
 
-    #############################################################################
-    # Fill in the Function below with to do all data handling for searching for #
-    # a movie                                                                   #
-    #############################################################################
-
-    page['title'] = '' # Add the title
-
+    # Gets a list of matching movies from db
+    movies = None
     if request.method == 'POST':
-        # Set up some variables to manage the post returns
+      movies = database.find_matchingmovies(request.form['searchterm'])
 
-        # Once retrieved, do some data integrity checks on the data
-
-        # Once verified, send the appropriate data to 
-
-        # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES or Go elsewhere
-        return render_template('searchitems/search_movies.html',
-                    session=session,
-                    page=page,
-                    user=user_details)
+    # Data Integrity checks
+    if movies == None or movies == []:
+      movies = []
+      page['bar'] = False
+      flash("No matching movies found, please try again")
     else:
-        # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
-        return render_template('searchitems/search_movies.html',
-                           session=session,
-                           page=page,
-                           user=user_details)
+      page['bar'] = True
+      flash('Found ' + str(len(movies)) + ' results!')
+      session['logged_in'] = True
 
+    return render_template('searchitems/search_movies.html',
+                          session=session,
+                          page=page,
+                          user=user_details,
+                          movies=movies)
 
 #####################################################
 #   Add Movie

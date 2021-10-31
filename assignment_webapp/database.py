@@ -972,7 +972,13 @@ def get_genre_songs(genre_id):
         # songs which belong to a particular genre_id                               #
         #############################################################################
         sql = """
-        """
+                SELECT s.song_id, s.song_title, 'song' as media_type
+                FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
+	                NATURAL JOIN mediaserver.metadatatype
+	                NATURAL JOIN mediaserver.metadata MD
+                WHERE MD.md_value = %s
+                ORDER BY s.song_id;
+              """
 
         r = dictfetchall(cur,sql,(genre_id,))
         print("return val is:")
@@ -1289,7 +1295,11 @@ def find_matchingmovies(searchterm):
         # that match a given search term                                            #
         #############################################################################
         sql = """
-        """
+                SELECT m.*
+                FROM mediaserver.movie m 
+                WHERE movie_title ~* %s
+                ORDER BY m.movie_id;
+              """
 
         r = dictfetchall(cur,sql,(searchterm,))
         print("return val is:")
