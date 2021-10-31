@@ -625,6 +625,7 @@ def single_tvshowep(tvshowep_id):
 #####################################################
 @app.route('/genre/<genre_id>')
 def single_genre(genre_id):
+
     """
     Show a single genre in your media server
     First, figure out what type of genre this is
@@ -637,6 +638,7 @@ def single_genre(genre_id):
         a. list all podcasts
     Can do this without a login
     """
+
     # # Check if the user is logged in, if not: back to login.
     # if('logged_in' not in session or not session['logged_in']):
     #     return redirect(url_for('login'))
@@ -649,20 +651,32 @@ def single_genre(genre_id):
     # Fill in the Function below with to do all data handling for a genre       #
     #############################################################################
 
-    page['title'] = '' # Add the title
+    page['title'] = 'Genre'
 
-    # Identify the type of genre - you may need to add a new function to database.py to do this
+    # Identify the type of genre and load items from db
+    type = database.get_genre_type(genre_id)
+    if type == 'song genre':
+      items = database.get_genre_songs(genre_id)
+    elif type == 'film genre':
+      items = database.get_genre_movies_and_shows(genre_id)
+    elif type == 'podcast genre':
+      items = database.get_genre_podcasts(genre_id)
+    else:
+      items = []
 
-    # Set up some variables to manage the returns from the database functions
-    #   There are some function frameworks provided for you to do this.
-    
-    # Once retrieved, do some data integrity checks on the data
+    #data integrity check
+    if items == None:
+      items = []
+    if type == None:
+      type = []
 
-    # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
     return render_template('singleitems/genre.html',
                            session=session,
                            page=page,
-                           user=user_details)
+                           user=user_details,
+                           items=items,
+                           type=type,
+                           genre=genre_id)
 
 
 #####################################################
@@ -721,36 +735,28 @@ def search_movies():
     if('logged_in' not in session or not session['logged_in']):
         return redirect(url_for('login'))
 
-    #########
-    # TODO  #  
-    #########
+    page['title'] = 'Movie Search'
 
-    #############################################################################
-    # Fill in the Function below with to do all data handling for searching for #
-    # a movie                                                                   #
-    #############################################################################
-
-    page['title'] = '' # Add the title
-
+    # Gets a list of matching movies from db
+    movies = None
     if request.method == 'POST':
-        # Set up some variables to manage the post returns
+      movies = database.find_matchingmovies(request.form['searchterm'])
 
-        # Once retrieved, do some data integrity checks on the data
-
-        # Once verified, send the appropriate data to 
-
-        # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES or Go elsewhere
-        return render_template('searchitems/search_movies.html',
-                    session=session,
-                    page=page,
-                    user=user_details)
+    # Data Integrity checks
+    if movies == None or movies == []:
+      movies = []
+      page['bar'] = False
+      flash("No matching movies found, please try again")
     else:
-        # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
-        return render_template('searchitems/search_movies.html',
-                           session=session,
-                           page=page,
-                           user=user_details)
+      page['bar'] = True
+      flash('Found ' + str(len(movies)) + ' results!')
+      session['logged_in'] = True
 
+    return render_template('searchitems/search_movies.html',
+                          session=session,
+                          page=page,
+                          user=user_details,
+                          movies=movies)
 
 #####################################################
 #   Add Movie
@@ -853,21 +859,137 @@ def add_song():
     # Fill in the Function below with to do all data handling for adding a song #
     #############################################################################
 
-    page['title'] = '' # Add the title
+    page['title'] = 'Song Creation' # Add the title
+
+    # location text, songdescription text, title varchar(250), 
+    # songlength int, songgenre text, artistid int
 
     if request.method == 'POST':
         # Set up some variables to manage the post returns
+        # songs = None
+        newdict = {}
+        print("request form is:")
+        print(request.form)
 
         # Once retrieved, do some data integrity checks on the data
+        # params: location,songdescription,title,songlength,songgenre,artistid
+        location = ""
+        if ('location' not in request.form):
+            newdict['location'] = 'Empty Storage Location'
+        else:
+            newdict['location'] = request.form['location']
+            print("We have a value: ",newdict['location']) # print to terminal
+            
+        if ('songdescription' not in request.form):
+            newdict['songdescription'] = 'Empty Song Description'
+        else:
+            newdict['songdescription'] = request.form['songdescription']
+            print("We have a value: ",newdict['songdescription']) # print to terminal
+        
+        # need to check if length of title is greater than 250
+        title = ""
+        if ('title' not in request.form):
+            newdict['title'] = 'Empty Song Title'
+        else:
+            # check the appropriateness of title
+            title = request.form['title']
+            if (len(title) > 250):
+                page['bar'] = False
+                flash("The title of the song input is too long, please use another title")
+                return redirect(url_for('add_song'))
+            
+            # the title is alright
+            newdict['title'] = request.form['title']
+            print("We have a value: ",newdict['title']) # print to terminal
+            
+        # need to check for appropriateness of input
+        songlength = 0
+        if ('songlength' not in request.form):
+            newdict['songlength'] = 0
+        else:
+            # check the appropriateness of song duration
+            songlength = request.form['songlength']
+            if (not songlength.isnumeric()): # non numeric/non integer
+                page['bar'] = False
+                flash("The duration of song input is not appropriate, please try again")
+                return redirect(url_for('add_song'))
+            
+            if (int(songlength) < 0): # song length is negative number
+                page['bar'] = False
+                flash("The duration of song input is not appropriate, please try again")
+                return redirect(url_for('add_song'))
+                
+            newdict['songlength'] = request.form['songlength']
+            print("We have a value: ",newdict['songlength']) # print to terminal
+        
+        # song genre (md_value)
+        if ('songgenre' not in request.form):
+            newdict['songgenre'] = 'No Song Genre'
+        else:
+            newdict['songgenre'] = request.form['songgenre']
+            print("We have a value: ",newdict['songgenre']) # print to terminal
+        
+        # need to check for appropriateness of input
+        # need to check if the artist exists in database
+        artistid = 0
+        if ('artistid' not in request.form):
+            newdict['artistid'] = 0 # no artist with 0 id
+        else:
+            # check appropriateness of artist
+            artistid = request.form['artistid']
+            if (not artistid.isnumeric()):
+                page['bar'] = False # non numeric id
+                flash("Please input an appropriate artist id, please try again")
+                return redirect(url_for('add_song'))
+                
+            if (int(artistid) < 0):
+                page['bar'] = False # negative id
+                flash("Please input an appropriate artist id, please try again")
+                return redirect(url_for('add_song'))
+            
+            # check whether the artist exists
+            is_artist_exist_in_database = False
+            artist_data = database.get_allartists() # returns a list of dictionaries
+            
+            for artist in artist_data:
+                if (artistid == artist['artist_id']):
+                    is_artist_exist_in_database = True
+                    break
+            
+            if (not is_artist_exist_in_database): # artist does not exist in database
+                page['bar'] = False # negative id
+                flash("Artist ID not found in database, please try again")
+                return redirect(url_for('add_song'))
+            
+            newdict['artistid'] = request.form['artistid']
+            print("We have a value: ",newdict['artistid']) # print to terminal
 
+        # -------------------TESTING-------------------
+        print('newdict is:')
+        print(newdict)
+        
         # Once verified, send the appropriate data to the database for insertion
+        location = newdict['location']
+        songdescription = newdict['songdescription']
+        title = newdict['title']
+        songlength = newdict['songlength']
+        songgenre = newdict['songgenre']
+        artistid = newdict['artistid']
+        
+        database.add_song_to_db(location, songdescription, title, songlength, songgenre, artistid)
+        
+        # Get the latest inserted song
+        try:
+            max_song_id = database.get_last_song()[0]['song_id'] # only one output
+        except:
+            page['bar'] = False
+            flash("Song was not successfully added for some reasons, please try again")
+            return redirect(url_for('add_song'))
+        
+        # ideally redirect to newly added song
+        return single_song(max_song_id)
 
-        # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
-        return render_template('singleitems/song.html',
-                           session=session,
-                           page=page,
-                           user=user_details)
-    else:
+    else: # request method is not POST
         return render_template('createitems/createsong.html',
                            session=session,
                            page=page,
