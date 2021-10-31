@@ -327,9 +327,6 @@ def list_tvshows():
                            user=user_details,
                            alltvshows=alltvshows)
 
-
-
-
 #####################################################
 #####################################################
 ####    List Individual items
@@ -652,23 +649,24 @@ def single_genre(genre_id):
     #############################################################################
 
     page['title'] = 'Genre'
-
+    items = None
     # Identify the type of genre and load items from db
     type = database.get_genre_type(genre_id)
-    if type == 'song genre':
+    print(type)
+    if type is None:
+      type = []
+    elif type[0]['md_type_name'] == 'song genre':
       items = database.get_genre_songs(genre_id)
-    elif type == 'film genre':
+    elif type[0]['md_type_name'] == 'film genre':
       items = database.get_genre_movies_and_shows(genre_id)
-    elif type == 'podcast genre':
+    elif type[0]['md_type_name'] == 'podcast genre':
       items = database.get_genre_podcasts(genre_id)
-    else:
-      items = []
 
     #data integrity check
     if items == None:
       items = []
-    if type == None:
-      type = []
+
+    print(items)
 
     return render_template('singleitems/genre.html',
                            session=session,
@@ -677,7 +675,6 @@ def single_genre(genre_id):
                            items=items,
                            type=type,
                            genre=genre_id)
-
 
 #####################################################
 #####################################################
