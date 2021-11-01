@@ -327,9 +327,6 @@ def list_tvshows():
                            user=user_details,
                            alltvshows=alltvshows)
 
-
-
-
 #####################################################
 #####################################################
 ####    List Individual items
@@ -466,14 +463,18 @@ def single_podcastep(media_id):
     page['title'] = '' # Add the title
 
     # Set up some variables to manage the returns from the database fucntions
-    
+    podcast_eps = None
+    podcast_eps = database.get_podcastep(media_id)
+    if podcast_eps == None:
+        podcast_eps = []
     # Once retrieved, do some data integrity checks on the data
 
     # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
     return render_template('singleitems/podcastep.html',
                            session=session,
                            page=page,
-                           user=user_details)
+                           user=user_details,
+                           podcast_eps=podcast_eps)
 
 
 #####################################################
@@ -652,23 +653,24 @@ def single_genre(genre_id):
     #############################################################################
 
     page['title'] = 'Genre'
-
+    items = None
     # Identify the type of genre and load items from db
     type = database.get_genre_type(genre_id)
-    if type == 'song genre':
+    print(type)
+    if type is None:
+      type = []
+    elif type[0]['md_type_name'] == 'song genre':
       items = database.get_genre_songs(genre_id)
-    elif type == 'film genre':
+    elif type[0]['md_type_name'] == 'film genre':
       items = database.get_genre_movies_and_shows(genre_id)
-    elif type == 'podcast genre':
+    elif type[0]['md_type_name'] == 'podcast genre':
       items = database.get_genre_podcasts(genre_id)
-    else:
-      items = []
 
     #data integrity check
     if items == None:
       items = []
-    if type == None:
-      type = []
+
+    print(items)
 
     return render_template('singleitems/genre.html',
                            session=session,
@@ -677,7 +679,6 @@ def single_genre(genre_id):
                            items=items,
                            type=type,
                            genre=genre_id)
-
 
 #####################################################
 #####################################################
@@ -729,7 +730,7 @@ def search_tvshows():
 @app.route('/search/movie', methods=['POST','GET'])
 def search_movies():
     """
-    Search all the movies in your media server
+    Search all the movies in your media servera
     """
     # Check if the user is logged in, if not: back to login.
     if('logged_in' not in session or not session['logged_in']):

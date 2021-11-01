@@ -131,14 +131,48 @@ SELECT DISTINCT MT.md_type_name
 FROM mediaserver.metadata MD NATURAL JOIN mediaserver.metadatatype MT
 WHERE MD.md_value = 'rock';
 
-
-SELECT s.song_id as item_id, s.song_title as item_title, 'song' as media_type
-FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
-	NATURAL JOIN mediaserver.metadatatype
-	NATURAL JOIN mediaserver.metadata MD
+/*(SELECT *--S.song_id AS item_id, S.song_title AS item_title, 'song' AS media_type
+FROM mediaserver.song S JOIN mediaserver.AudioMedia AM ON (S.song_id = AM.media_id)
+	LEFT OUTER JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	LEFT OUTER JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	LEFT OUTER JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	LEFT OUTER JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id))
+EXCEPT	*/
+(SELECT S.song_id AS item_id, S.song_title AS item_title, 'song' AS media_type
+FROM mediaserver.song S JOIN mediaserver.AudioMedia AM ON (S.song_id = AM.media_id)
+	JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id))         
 WHERE MD.md_value ='rock'
 ORDER BY s.song_id;
 
 --Q10 - Get all podcasts for one podcast_genre
+SELECT P.podcast_id as item_id, P.podcast_episode_title as item_title, 'podcast' as media_type
+FROM (mediaserver.podcastepisode P JOIN mediaserver.AudioMedia AM on (p.media_id = AM.media_id))
+	JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
+WHERE MT.md_type_name = %s
+
+--overall podcast
+SELECT * --p.podcast_id as item_id, p.podcast_title as item_title, 'podcast' as media_type
+FROM (mediaserver.podcast p JOIN mediaserver.PodcastMetaData PMD on (p.podcast_id = PMD.podcast_id))
+	JOIN mediaserver.MetaData MD on (PMD.md_id = MD.md_id)
+	JOIN mediaserver.MetaDataType MT on (MD.md_type_id = MT.md_type_id)
+--WHERE MT.md_type_name ~* ''
+--ORDER BY p.podcast_id;
+
 --Q10 - Get all movies and tv shows for one film_genre
+SELECT P.podcast_id as item_id, P.podcast_episode_title as item_title, 'podcast' as media_type
+FROM (mediaserver.podcastepisode P JOIN mediaserver.AudioMedia AM on (p.media_id = AM.media_id))
+	JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
+WHERE MT.md_type_name = %s
+
+
+
 
