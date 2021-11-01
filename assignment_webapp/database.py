@@ -818,6 +818,10 @@ def get_podcastep(podcastep_id):
         # podcast episodes and it's associated metadata                             #
         #############################################################################
         sql = """
+        SELECT PCE.podcast_id, PCE.podcast_episode_title, PCE.podcast_episode_URI, PCE.podcast_episode_published_date, PCE.podcast_episode_length,MDT.md_type_name, MD.md_value
+            FROM mediaserver.PodcastEpisode PCE NATURAL JOIN mediaserver.PodcastMetaData PMD
+                JOIN mediaserver.MetaData MD using (md_id) JOIN mediaserver.MetaDataType MDT using (md_type_id)
+        WHERE PCE.podcast_id = %s;
         """
 
         r = dictfetchall(cur,sql,(podcastep_id,))
@@ -850,7 +854,7 @@ def get_album(album_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -894,7 +898,7 @@ def get_album_songs(album_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -940,7 +944,7 @@ def get_album_genres(album_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -970,7 +974,7 @@ def get_album_genres(album_id):
 
 #####################################################
 #   Query (10)
-#   May require the addition of SQL to multiple 
+#   May require the addition of SQL to multiple
 #   functions and the creation of a new function to
 #   determine what type of genre is being provided
 #   You may have to look at the hard coded values
@@ -1012,6 +1016,15 @@ def get_genre_songs(genre_id):
         return None
     cur = conn.cursor()
     try:
+        #########
+        # TODO  #
+        #########
+
+        #############################################################################
+        # Fill in the SQL below with a query to get all information about all       #
+        # songs which belong to a particular genre_id                               #
+        #############################################################################
+
         sql = """
                 SELECT S.song_id AS item_id, S.song_title AS item_title, 'Song' AS media_type
                 FROM mediaserver.song S
@@ -1049,7 +1062,7 @@ def get_genre_podcasts(genre_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -1096,7 +1109,7 @@ def get_genre_movies_and_shows(genre_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -1153,7 +1166,7 @@ def get_tvshow(tvshow_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -1197,7 +1210,7 @@ def get_all_tvshoweps_for_tvshow(tvshow_id):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -1353,7 +1366,7 @@ def find_matchingmovies(searchterm):
     cur = conn.cursor()
     try:
         #########
-        # TODO  #  
+        # TODO  #
         #########
 
         #############################################################################
@@ -1422,18 +1435,43 @@ def add_movie_to_db(title,release_year,description,storage_location,genre):
 #   Query (8)
 #   Add a new Song
 #####################################################
-def add_song_to_db(location,songdescription,title,songlength,songgenre,artistid):
+def add_song_to_db(storage_location_description,title,songlength,genre,artistid):
+
     """
-    Get all the matching Movies in your media server
+    Get all the matching Movies in your media servera
     """
     #########
-    # TODO  #  
+    # TODO  #
     #########
+    conn = database_connect()
+    if (conn is None):
+        return None
+    cur = conn.cursor()
+    try:
+        # Try executing the SQL and get from the database
+        sql = """
+        SELECT 
+            mediaserver.addSong(
+                %s,%s,%s,%s,%s,%s);
+        """
+        cur.execute(sql, (storage_location, description, title, songlength, genre,artistid))
+        conn.commit()  # Commit the transaction
+        r = cur.fetchone()
+        print("return val is:")
+        print(r)
+        cur.close()  # Close the cursor
+        conn.close()  # Close the connection to the db
+        return r
+    except:
+        print("Unexpected error adding a song:", sys.exc_info()[0])
+        raise
 
     #############################################################################
     # Fill in the Function  with a query and management for how to add a new    #
     # song to your media server. Make sure you manage all constraints           #
     #############################################################################
+    cur.close()
+    conn.close()
     return None
 
 

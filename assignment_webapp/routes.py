@@ -463,14 +463,18 @@ def single_podcastep(media_id):
     page['title'] = '' # Add the title
 
     # Set up some variables to manage the returns from the database fucntions
-    
+    podcast_eps = None
+    podcast_eps = database.get_podcastep(media_id)
+    if podcast_eps == None:
+        podcast_eps = []
     # Once retrieved, do some data integrity checks on the data
 
     # NOTE :: YOU WILL NEED TO MODIFY THIS TO PASS THE APPROPRIATE VARIABLES
     return render_template('singleitems/podcastep.html',
                            session=session,
                            page=page,
-                           user=user_details)
+                           user=user_details,
+                           podcast_eps=podcast_eps)
 
 
 #####################################################
@@ -726,7 +730,7 @@ def search_tvshows():
 @app.route('/search/movie', methods=['POST','GET'])
 def search_movies():
     """
-    Search all the movies in your media server
+    Search all the movies in your media servera
     """
     # Check if the user is logged in, if not: back to login.
     if('logged_in' not in session or not session['logged_in']):
