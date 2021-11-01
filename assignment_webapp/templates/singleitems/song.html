@@ -10,6 +10,7 @@
             <h3> Artworks </h3>
             {% for instance in songmetadata %}
                 {% if instance.md_type_name == 'artwork' %}
+
                     <img src="{{instance.md_value}}" alt="image">
                     <br/>© Spotify Public Domain 2019.
                 {% endif %}
@@ -18,6 +19,7 @@
             <h3> Descriptions </h3>
             {% for instance in songmetadata %}
                 {% if instance.md_type_name == 'description' %}
+
                     <div>
                         {{instance.md_value}}
                     </div>
@@ -30,9 +32,14 @@
             <h3> Genres </h3>
             {% for instance in songmetadata %}
                 {% if instance.md_type_name == 'song genre' %}
-                    <div>
-                        {{instance.md_value}}
-                    </div>
+                <table>
+
+                  <tbody>
+                    <tr class="clickable-tr" data-href="{{ url_for('single_genre', genre_id=instance.md_value)}}">
+                      <td>&nbsp&nbsp{{instance.md_value}}</td>
+                    </tr>
+                  </tbody>
+                  </table>
                 {% endif %}
             {% endfor %}
         {% else %}

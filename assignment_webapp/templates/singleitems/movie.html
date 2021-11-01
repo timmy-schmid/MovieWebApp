@@ -27,8 +27,14 @@
             <h3> Genres </h3>
             {% for instance in movie %}
                 {% if instance.md_type_name == 'film genre' %}
-                        {{instance.md_value}}
-                        <br/>
+                <table>
+                  <tbody>
+                    <tr class="clickable-tr" data-href="{{ url_for('single_genre', genre_id=instance.md_value)}}">
+                      <td>&nbsp&nbsp{{instance.md_value}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <br/>
                 {% endif %}
             {% endfor %}
         {% else %}
