@@ -123,6 +123,8 @@ def dictfetchone(cursor,sqltext,params=None):
     cursor.execute(sqltext,params)
     cols = [a[0].decode("utf-8") for a in cursor.description]
     returnres = cursor.fetchone()
+    print(cols)
+    print(returnres)
     result.append({a:b for a,b in zip(cols, returnres)})
     return result
 
@@ -986,7 +988,7 @@ def get_genre_type(genre_id): ##Helper function
             FROM mediaserver.metadata MD NATURAL JOIN mediaserver.metadatatype MT
             WHERE MD.md_value = %s;
           """
-    r = dictfetchone(cur,sql,genre_id)
+    r = dictfetchone(cur,sql,(genre_id,))
     print("return val is:")
     print(r)
     cur.close()                     # Close the cursor

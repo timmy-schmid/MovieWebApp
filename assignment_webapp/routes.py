@@ -654,28 +654,34 @@ def single_genre(genre_id):
     page['title'] = 'Genre'
 
     # Identify the type of genre and load items from db
-    type = database.get_genre_type(genre_id)
-    if type == 'song genre':
-      items = database.get_genre_songs(genre_id)
-    elif type == 'film genre':
-      items = database.get_genre_movies_and_shows(genre_id)
-    elif type == 'podcast genre':
-      items = database.get_genre_podcasts(genre_id)
+    genre_type = database.get_genre_type(genre_id)
+    if (genre_type[0]['md_type_name'] == 'song genre'):
+        items = database.get_genre_songs(genre_id)
+        print(items)
+        
+    elif genre_type == 'film genre':
+        items = database.get_genre_movies_and_shows(genre_id)
+        
+    elif genre_type == 'podcast genre':
+        items = database.get_genre_podcasts(genre_id)
+        
     else:
-      items = []
+        items = []
 
     #data integrity check
+    if genre_type == None:
+        genre_type = []
+    
     if items == None:
-      items = []
-    if type == None:
-      type = []
-
+        items = []
+    
+    
     return render_template('singleitems/genre.html',
                            session=session,
                            page=page,
                            user=user_details,
                            items=items,
-                           type=type,
+                           genre_type=genre_type,
                            genre=genre_id)
 
 
