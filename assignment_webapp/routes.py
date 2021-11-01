@@ -651,21 +651,6 @@ def single_genre(genre_id):
     page['title'] = 'Genre'
     items = None
     # Identify the type of genre and load items from db
-<<<<<<< HEAD
-    genre_type = database.get_genre_type(genre_id)
-    if (genre_type[0]['md_type_name'] == 'song genre'):
-        items = database.get_genre_songs(genre_id)
-        print(items)
-        
-    elif genre_type == 'film genre':
-        items = database.get_genre_movies_and_shows(genre_id)
-        
-    elif genre_type == 'podcast genre':
-        items = database.get_genre_podcasts(genre_id)
-        
-    else:
-        items = []
-=======
     type = database.get_genre_type(genre_id)
     print(type)
     if type is None:
@@ -676,23 +661,16 @@ def single_genre(genre_id):
       items = database.get_genre_movies_and_shows(genre_id)
     elif type[0]['md_type_name'] == 'podcast genre':
       items = database.get_genre_podcasts(genre_id)
->>>>>>> 11784fdbe3fa4a2a3542f194970d5134bea080f7
 
     #data integrity check
     if genre_type == None:
         genre_type = []
     
     if items == None:
-<<<<<<< HEAD
-        items = []
-    
-    
-=======
       items = []
 
     print(items)
 
->>>>>>> 11784fdbe3fa4a2a3542f194970d5134bea080f7
     return render_template('singleitems/genre.html',
                            session=session,
                            page=page,
