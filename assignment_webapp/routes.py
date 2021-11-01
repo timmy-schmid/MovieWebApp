@@ -706,7 +706,7 @@ def search_tvshows():
 @app.route('/search/movie', methods=['POST','GET'])
 def search_movies():
     """
-    Search all the movies in your media server
+    Search all the movies in your media servera
     """
     # Check if the user is logged in, if not: back to login.
     if('logged_in' not in session or not session['logged_in']):
