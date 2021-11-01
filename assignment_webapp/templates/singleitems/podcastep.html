@@ -3,6 +3,7 @@
     <div class="container details">
         <!-- TODO Query (7)
         Display All Relevant Podcast Episode Infromation including meta data
+	-->
 {% if podcast | length > 0 %}
             <h2 class="title"> {{podcast_eps[0].podcast_episode_title}} ({{podcast_eps[0].podcast_id}})</h2>
             <hr/>
@@ -49,7 +50,6 @@
         {% else %}
             <h2 class="title"> Invalid Podcast Episode ID</h2>
         {% endif %}
-        -->
         <!-- TODO - Query (10)
         You will have to modify the above approach slightly to make each genre clickable
         -->
