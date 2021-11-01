@@ -124,8 +124,8 @@ def dictfetchone(cursor,sqltext,params=None):
     cols = [a[0].decode("utf-8") for a in cursor.description]
     returnres = cursor.fetchone()
     if returnres is not None:
-      result.append({a:b for a,b in zip(cols, returnres)})
-      return result
+        result.append({a:b for a,b in zip(cols, returnres)})
+        return result
     return None
 
 
@@ -1435,7 +1435,7 @@ def add_movie_to_db(title,release_year,description,storage_location,genre):
 #   Query (8)
 #   Add a new Song
 #####################################################
-def add_song_to_db(storage_location_description,title,songlength,genre,artistid):
+def add_song_to_db(storage_location, description,title,songlength,genre,artistid):
 
     """
     Get all the matching Movies in your media servera

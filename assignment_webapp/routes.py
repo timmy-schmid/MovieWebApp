@@ -953,7 +953,7 @@ def add_song():
             artist_data = database.get_allartists() # returns a list of dictionaries
             
             for artist in artist_data:
-                if (artistid == artist['artist_id']):
+                if (int(artistid) == artist['artist_id']):
                     is_artist_exist_in_database = True
                     break
             
