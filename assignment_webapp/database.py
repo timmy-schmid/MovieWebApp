@@ -1013,12 +1013,15 @@ def get_genre_songs(genre_id):
     cur = conn.cursor()
     try:
         sql = """
-                SELECT s.song_id AS item_id, s.song_title AS item_title, 'song' as media_type
-                FROM (mediaserver.song s JOIN mediaserver.mediaitemmetadata mi on (s.song_id = mi.media_id))
-	                NATURAL JOIN mediaserver.metadatatype
-	                NATURAL JOIN mediaserver.metadata MD
+                SELECT S.song_id AS item_id, S.song_title AS item_title, 'Song' AS media_type
+                FROM mediaserver.song S
+                  JOIN mediaserver.AudioMedia AM ON (S.song_id = AM.media_id)
+	                JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	                JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	                JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	                JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
                 WHERE MD.md_value = %s
-                ORDER BY s.song_id;
+                ORDER BY item_title;
               """
 
         r = dictfetchall(cur,sql,(genre_id,))
@@ -1054,6 +1057,15 @@ def get_genre_podcasts(genre_id):
         # podcasts which belong to a particular genre_id                            #
         #############################################################################
         sql = """
+                SELECT P.podcast_id as item_id, P.podcast_episode_title as item_title, 'podcast' as media_type
+                FROM (mediaserver.podcastepisode P
+                  JOIN mediaserver.AudioMedia AM on (P.media_id = AM.media_id))
+	                JOIN mediaserver.MediaItem MI ON (AM.media_id = MI.media_id)
+	                JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+	                JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+	                JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
+                WHERE MD.md_value = %s
+                ORDER BY item_title;
         """
 
         r = dictfetchall(cur,sql,(genre_id,))
@@ -1092,9 +1104,25 @@ def get_genre_movies_and_shows(genre_id):
         # movies and tv shows which belong to a particular genre_id                 #
         #############################################################################
         sql = """
-        """
+                (SELECT T.tvshow_id as item_id, T.tvshow_title as item_title, 'TV Show' as media_type
+                 FROM (mediaserver.tvshow T
+                  JOIN mediaserver.tvshowmetadata TMD on (T.tvshow_id = TMD.tvshow_id))
+                  JOIN mediaserver.MetaData MD ON (TMD.md_id = MD.md_id)
+                  JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
+                 WHERE MD.md_value = %s)
+                UNION
+                (SELECT M.movie_id AS item_id, M.movie_title AS item_title, 'Movie' As media_type
+                 FROM (mediaserver.Movie M
+                  JOIN mediaserver.VideoMedia VM ON (M.movie_id = VM.media_id))
+                  JOIN mediaserver.MediaItem MI ON (VM.media_id = MI.media_id)
+                  JOIN mediaserver.MediaItemMetaData MIMD ON (MI.media_id = MIMD.media_id)
+                  JOIN mediaserver.MetaData MD ON (MIMD.md_id = MD.md_id)
+                  JOIN mediaserver.MetaDataType MT ON (MD.md_type_id = MT.md_type_id)
+                 WHERE MD.md_value = %s)
+                ORDER BY item_title;
+              """
 
-        r = dictfetchall(cur,sql,(genre_id,))
+        r = dictfetchall(cur,sql,(genre_id,genre_id,))
         print("return val is:")
         print(r)
         cur.close()                     # Close the cursor

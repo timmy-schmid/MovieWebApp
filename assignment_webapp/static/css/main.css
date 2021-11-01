@@ -245,6 +245,11 @@ LAYOUT
   }
 }
 
+img {
+  width:100%;
+  max-width: 300px;
+}
+
 .page-footer {
   background-color: #252525;
   position: relative;
@@ -381,8 +386,6 @@ form.login button[type="submit"] {
   margin: 30px auto;
 }
 
-
-
 .clickable-tr:hover {
   cursor: pointer;
   background: #efefef;
@@ -452,5 +455,7 @@ form.search-top {
     clear: both;
     margin: 10px 0px;
 }
+
+
 
 }
