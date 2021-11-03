@@ -417,7 +417,7 @@ def single_podcast(podcast_id):
     # Fill in the Function below with to do all data handling for a podcast     #
     #############################################################################
 
-    page['title'] = '' # Add the title
+    page['title'] = 'Podcast' # Add the title
 
     # Set up some variables to manage the returns from the database fucntions
     # Query (6 a,b,c,d,e)
@@ -460,7 +460,7 @@ def single_podcastep(media_id):
     # Fill in the Function below with to do all data handling for a podcast ep  #
     #############################################################################
 
-    page['title'] = '' # Add the title
+    page['title'] = 'Podcast Episode' # Add the title
 
     # Set up some variables to manage the returns from the database fucntions
     podcast_eps = None
@@ -877,7 +877,6 @@ def add_song():
 
         # Once retrieved, do some data integrity checks on the data
         # params: location,songdescription,title,songlength,songgenre,artistid
-        location = ""
         if ('location' not in request.form):
             newdict['location'] = 'Empty Storage Location'
         else:
@@ -918,7 +917,7 @@ def add_song():
                 flash("The duration of song input is not appropriate, please try again")
                 return redirect(url_for('add_song'))
             
-            if (int(songlength) < 0): # song length is negative number
+            if (int(songlength) <= 0): # song length is negative number
                 page['bar'] = False
                 flash("The duration of song input is not appropriate, please try again")
                 return redirect(url_for('add_song'))

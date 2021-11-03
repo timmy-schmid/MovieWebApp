@@ -818,10 +818,10 @@ def get_podcastep(podcastep_id):
         # podcast episodes and it's associated metadata                             #
         #############################################################################
         sql = """
-        SELECT PCE.podcast_id, PCE.podcast_episode_title, PCE.podcast_episode_URI, PCE.podcast_episode_published_date, PCE.podcast_episode_length,MDT.md_type_name, MD.md_value
-            FROM mediaserver.PodcastEpisode PCE NATURAL JOIN mediaserver.PodcastMetaData PMD
-                JOIN mediaserver.MetaData MD using (md_id) JOIN mediaserver.MetaDataType MDT using (md_type_id)
-        WHERE PCE.podcast_id = %s;
+SELECT 	PCE.media_id, PCE.podcast_episode_title, PCE.podcast_episode_URI, PCE.podcast_episode_published_date, PCE.podcast_episode_length,MDT.md_type_name, MD.md_value
+FROM 	mediaserver.PodcastEpisode PCE NATURAL JOIN mediaserver.PodcastMetaData PMD
+      	JOIN mediaserver.MetaData MD using (md_id) JOIN mediaserver.MetaDataType MDT using (md_type_id)
+WHERE PCE.media_id = %s;
         """
 
         r = dictfetchall(cur,sql,(podcastep_id,))
@@ -1438,7 +1438,7 @@ def add_movie_to_db(title,release_year,description,storage_location,genre):
 def add_song_to_db(storage_location, description,title,songlength,genre,artistid):
 
     """
-    Get all the matching Movies in your media servera
+    Add a new Song to your media server
     """
     #########
     # TODO  #

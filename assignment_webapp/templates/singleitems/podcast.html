@@ -1,10 +1,12 @@
 {% include 'top.html' %}
 <div class="content">
     <div class="container details">
+
         <!-- TODO Query (6)  
         Display All Relevant Podcast Infromation including meta data
         Display All Relevant Podcast Episodes for this Podcast
         -->
+
         {% if podcast | length > 0 %}
             <h2 class="title"> {{podcast[0].podcast_title}} ({{podcast[0].podcast_id}})</h2>
             <hr/>
@@ -67,6 +69,7 @@
                     <tbody>
                         <!-- Add a for loop to iterate over the episodes -->
                         {% for eps in podcast_eps %}
+			<tr class="clickable-tr" data-href="{{ url_for('single_podcastep', media_id=eps.media_id) }}">
                             <td>{{eps.media_id}}</td>
                             <td>{{eps.podcast_episode_title}}</td>
                             <td>{{eps.podcast_episode_uri}}</td>

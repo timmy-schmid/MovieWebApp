@@ -337,10 +337,10 @@ $BODY$
         INSERT INTO mediaserver.MediaItemMetaData
         SELECT media_id, genre_md_id FROM ins1, ins5
         )
-	,ins7 AS(
-	INSERT INTO mediaserver.Song_artists(song_id,performing_artist_id)
-	SELECT media_id, artistid FROM ins1
-	)
+		,ins7 AS(
+		INSERT INTO mediaserver.Song_artists(song_id,performing_artist_id)
+		SELECT media_id, artistid FROM ins1
+		)
         INSERT INTO mediaserver.MediaItemMetaData
         SELECT media_id, md_id FROM ins1, ins2;
 
