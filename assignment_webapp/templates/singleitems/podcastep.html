@@ -41,9 +41,13 @@
             <h3> Genres </h3>
             {% for instance in podcast_eps %}
                 {% if instance.md_type_name == 'podcast genre' %}
-                    <div>
-                        {{instance.md_value}}
-                    </div>        
+			<table>
+			  <tbody>
+			  <tr class="clickable-tr" data-href="{{ url_for('single_genre', genre_id=instance.md_value)}}">
+                            <td>{{instance.md_value}}</td>
+			  </tr>
+			  </tbody>
+			</table>
                 {% endif %}
             {% endfor %}
                     
