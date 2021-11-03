@@ -667,8 +667,8 @@ def single_genre(genre_id):
       items = database.get_genre_podcasts(genre_id)
 
     #data integrity check
-    if genre_type == None:
-        genre_type = []
+    if type == None:
+        type = []
     
     if items == None:
       items = []
@@ -680,7 +680,7 @@ def single_genre(genre_id):
                            page=page,
                            user=user_details,
                            items=items,
-                           genre_type=genre_type,
+                           type=type,
                            genre=genre_id)
 
 #####################################################
@@ -882,13 +882,13 @@ def add_song():
             newdict['location'] = 'Empty Storage Location'
         else:
             newdict['location'] = request.form['location']
-            print("We have a value: ",newdict['location']) # print to terminal
+            print("Location: ",newdict['location']) # print to terminal
             
         if ('songdescription' not in request.form):
             newdict['songdescription'] = 'Empty Song Description'
         else:
             newdict['songdescription'] = request.form['songdescription']
-            print("We have a value: ",newdict['songdescription']) # print to terminal
+            print("Song Description: ",newdict['songdescription']) # print to terminal
         
         # need to check if length of title is greater than 250
         title = ""
@@ -904,7 +904,7 @@ def add_song():
             
             # the title is alright
             newdict['title'] = request.form['title']
-            print("We have a value: ",newdict['title']) # print to terminal
+            print("Title: ",newdict['title']) # print to terminal
             
         # need to check for appropriateness of input
         songlength = 0
@@ -924,14 +924,14 @@ def add_song():
                 return redirect(url_for('add_song'))
                 
             newdict['songlength'] = request.form['songlength']
-            print("We have a value: ",newdict['songlength']) # print to terminal
+            print("Song Length: ",newdict['songlength']) # print to terminal
         
         # song genre (md_value)
         if ('songgenre' not in request.form):
             newdict['songgenre'] = 'No Song Genre'
         else:
             newdict['songgenre'] = request.form['songgenre']
-            print("We have a value: ",newdict['songgenre']) # print to terminal
+            print("Song Genre: ",newdict['songgenre']) # print to terminal
         
         # need to check for appropriateness of input
         # need to check if the artist exists in database
@@ -954,9 +954,11 @@ def add_song():
             # check whether the artist exists
             is_artist_exist_in_database = False
             artist_data = database.get_allartists() # returns a list of dictionaries
+            print("artist_data:")
+            print(artist_data)
             
             for artist in artist_data:
-                if (artistid == artist['artist_id']):
+                if (int(artistid) == artist['artist_id']):
                     is_artist_exist_in_database = True
                     break
             
@@ -966,7 +968,7 @@ def add_song():
                 return redirect(url_for('add_song'))
             
             newdict['artistid'] = request.form['artistid']
-            print("We have a value: ",newdict['artistid']) # print to terminal
+            print("Artist Id: ",newdict['artistid']) # print to terminal
 
         # -------------------TESTING-------------------
         print('newdict is:')
@@ -980,11 +982,16 @@ def add_song():
         songgenre = newdict['songgenre']
         artistid = newdict['artistid']
         
+        # def add_song_to_db(storage_location_description,title,songlength,genre,artistid):
         database.add_song_to_db(location, songdescription, title, songlength, songgenre, artistid)
+        page['bar'] = True
+        flash('Successfully Added a New Song!')
         
         # Get the latest inserted song
+        max_song_id = 0
         try:
             max_song_id = database.get_last_song()[0]['song_id'] # only one output
+            print(max_song_id)
         except:
             page['bar'] = False
             flash("Song was not successfully added for some reasons, please try again")

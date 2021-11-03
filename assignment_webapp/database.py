@@ -1435,7 +1435,7 @@ def add_movie_to_db(title,release_year,description,storage_location,genre):
 #   Query (8)
 #   Add a new Song
 #####################################################
-def add_song_to_db(storage_location_description,title,songlength,genre,artistid):
+def add_song_to_db(storage_location,description,title,songlength,genre,artistid):
 
     """
     Get all the matching Movies in your media servera
@@ -1454,7 +1454,7 @@ def add_song_to_db(storage_location_description,title,songlength,genre,artistid)
             mediaserver.addSong(
                 %s,%s,%s,%s,%s,%s);
         """
-        cur.execute(sql, (storage_location, description, title, songlength, genre,artistid))
+        cur.execute(sql, (storage_location, description, title, songlength, genre, artistid))
         conn.commit()  # Commit the transaction
         r = cur.fetchone()
         print("return val is:")
