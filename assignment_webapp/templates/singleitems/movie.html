@@ -4,6 +4,46 @@
         <!-- Check if We have a valid Movie -->
         {% if movie | length > 0 %}
             <h2 class="title"> {{movie[0].movie_title}} ({{movie[0].release_year}})</h2>
+            
+            <video id="player"
+              controls
+              src="{{songmetadata[0].storage_location}}">
+              Your browser does not support the audio element.
+            </video>
+
+        {% if user['username'] | length > 0 %}
+          <script>
+            var audio = document.getElementById('player');
+            audio.onloadedmetadata = function() {
+              audio.currentTime = audio.duration * {{progress}} / 100;
+            };
+
+            // Create event listener timeupdate
+            document.getElementById('player').addEventListener('pause',updateProgress)
+            
+            function updateProgress() {
+
+              var currProgress = Math.round(audio.currentTime / audio.duration * 10000) / 100;
+              var userName = '{{user['username']}}';
+              var mediaId = '{{song[0].song_id}}';
+
+              console.log(userName);
+              console.log(mediaId);
+              console.log(currProgress);
+              $.post('/updateplayback', {
+                username: userName,
+                media_id: mediaId,
+                progress: currProgress
+              }).done(function(response) {
+                console.log("success");
+              }).fail(function() {
+                console.log("fail");
+             });     
+            }
+          </script>
+            
+            
+            
             <hr/>
             <h3> Artworks </h3>
             {% for instance in movie %}

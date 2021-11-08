@@ -4,6 +4,49 @@
         <!-- Check if We have a valid tvshow ep -->
         {% if tvshowep | length > 0 %}
             <h2 class="title"> {{tvshowep[0].tvshow_episode_title}} aired on {{tvshowep[0].air_date}} </h2>
+            
+            <video id="player"
+            controls
+           
+            src="{{location}}">
+            Your browser does not support the audio element.
+          </video>
+
+          {% if user['username'] | length > 0 %}
+            <script>
+              console.log('{{location}}');
+              var media = document.getElementById('player');
+              media.onloadedmetadata = function() {
+                media.currentTime = media.duration * {{progress.progress}} / 100;
+              };
+
+              // Create event listener timeupdate
+              document.getElementById('player').addEventListener('pause',updateProgress)
+              
+              function updateProgress() {
+
+                var currProgress = Math.round(media.currentTime / media.duration * 10000) / 100;
+                var userName = '{{user['username']}}';
+                var mediaId = '{{tvshowep[0].media_id}}';
+
+                console.log(userName);
+                console.log(mediaId);
+                console.log(currProgress);
+                $.post('/updateplayback', {
+                  username: userName,
+                  media_id: mediaId,
+                  progress: currProgress
+                }).done(function(response) {
+                  console.log("success");
+                }).fail(function() {
+                  console.log("fail");
+              });     
+              }
+            </script>
+            {% endif %}
+
+
+            
             <br/>
             <h2 class="title"> Season {{tvshowep[0].season}}, Episode {{tvshowep[0].episode}} </h2>
             <br/>
