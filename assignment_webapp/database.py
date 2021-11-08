@@ -423,7 +423,6 @@ def get_user_media_playback(username,media_id):
   conn.close()                    # Close the connection to the db
   return None
 
-
 def update_user_media_playback(username,media_id,progress):
     conn = database_connect()
     if(conn is None):

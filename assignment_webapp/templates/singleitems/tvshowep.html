@@ -8,16 +8,15 @@
             <video id="player"
             controls
            
-            src="{{location}}">
+            src="{{location[0].storage_location}}">
             Your browser does not support the audio element.
           </video>
 
           {% if user['username'] | length > 0 %}
             <script>
-              console.log('{{location}}');
               var media = document.getElementById('player');
               media.onloadedmetadata = function() {
-                media.currentTime = media.duration * {{progress.progress}} / 100;
+                media.currentTime = media.duration * {{progress[0].progress}} / 100;
               };
 
               // Create event listener timeupdate

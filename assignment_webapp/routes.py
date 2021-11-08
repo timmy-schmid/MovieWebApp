@@ -417,12 +417,6 @@ def update_playback_progress():
     status = None
   else:
     if(request.method == 'POST'):
-      print(request.form['username'])
-      print(type(request.form['username']))
-      print(request.form['media_id'])
-      print(type(request.form['media_id']))
-      print(request.form['progress'])
-      print(type(request.form['progress']))
       database.update_user_media_playback(request.form['username'],request.form['media_id'],request.form['progress'])
   
   return "OK"
@@ -625,7 +619,7 @@ def single_tvshowep(tvshowep_id):
     if('logged_in' not in session or not session['logged_in']):
       progress = None
     else:
-      progress = database.get_user_media_playback(user_details['username'],tvshowep_id)[0]['progress']
+      progress = database.get_user_media_playback(user_details['username'],tvshowep_id)
   
 
     print(progress)
@@ -636,16 +630,16 @@ def single_tvshowep(tvshowep_id):
     tvshowep = database.get_tvshowep(tvshowep_id)
 
     location = None
-    location = database.get_media_location(tvshowep_id)[0]['storage_location']
+    location = database.get_media_location(tvshowep_id)
 
-
+    print("LOCATION")
+    print(location)
     # Data integrity checks
     if tvshowep == None:
         tvshowep = []
     
     if location == None:
       location = []
-
 
     return render_template('singleitems/tvshowep.html',
                            session=session,
