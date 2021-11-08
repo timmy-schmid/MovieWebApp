@@ -96,9 +96,8 @@ def print_sql_string(inputstring, params=None):
 #           {col1name:col1value,col2name:col2value, etc.}, 
 #           etc.]
 #####################################################
-
+"""
 def dictfetchall(cursor,sqltext,params=None):
-    """ Returns query results as list of dictionaries."""
     
     result = []
     if (params is None):
@@ -114,7 +113,35 @@ def dictfetchall(cursor,sqltext,params=None):
     for row in returnres:
         result.append({a:b for a,b in zip(cols, row)})
     # cursor.close()
-    return result
+    return result"""
+
+def dictfetchall(cursor,sqltext,params=None):
+    """ Returns query results as list of dictionaries."""
+    
+    result = []
+    if (params is None):
+        print(sqltext)
+    else:
+        print("we HAVE PARAMS!")
+        print_sql_string(sqltext,params)
+    
+    cursor.execute(sqltext,params)
+    print(cursor.rowcount, "record(s) affected")
+    
+    if (cursor.description != None):
+        cols = [a[0].decode("utf-8") for a in cursor.description]
+        print(cols)
+        
+        returnres = cursor.fetchall()
+        for row in returnres:
+            result.append({a:b for a,b in zip(cols, row)})
+        # cursor.close()
+        return result
+    
+    else:
+        return cursor.rowcount, "record(s) affected"
+
+
 
 def dictfetchone(cursor,sqltext,params=None):
     """ Returns query results as list of dictionaries."""
@@ -344,6 +371,33 @@ ORDER BY MC.media_id;
     conn.close()                    # Close the connection to the db
     return None
 
+
+def get_media_location(media_id):
+  conn = database_connect()
+  if(conn is None):
+    return None
+  cur = conn.cursor()
+  
+  try:
+    sql = """
+            SELECT *
+            FROM mediaserver.mediaitem MI
+            WHERE MI.media_id = %s
+          """
+    r = dictfetchone(cur,sql,(media_id,))
+    cur.close()
+    conn.close()
+    return r
+  except:
+    print("Unexpected error getting User Consumption - Likely no values:", sys.exc_info()[0])
+  
+  cur.close()                     # Close the cursor
+  conn.close()                    # Close the connection to the db
+  return None
+
+
+
+
 #gets playback of a media item
 def get_user_media_playback(username,media_id):
   conn = database_connect()
@@ -371,27 +425,29 @@ def get_user_media_playback(username,media_id):
 
 
 def update_user_media_playback(username,media_id,progress):
-  conn = database_connect()
-  if(conn is None):
-    return None
-  cur = conn.cursor()
+    conn = database_connect()
+    if(conn is None):
+        return None
+    cur = conn.cursor()
 
-  try:
+  # try:
     sql = """
-            UPDATE mediaserver.usermediaconsumption
-            SET progress = %s
-            WHERE username = %s AND media_id = %s; 
+            UPDATE     mediaserver.usermediaconsumption
+            SET     progress = CAST(%s AS DECIMAL), lastviewed = CURRENT_DATE, play_count = play_count + 1
+            WHERE     username = %s AND media_id = %s;
           """
-    r = dictfetchone(cur,sql,(username,media_id,progress))
+    r = dictfetchall(cur,sql,(progress,username,media_id))
+    conn.commit()
+    print(r)
+    print("Got Here!")
+    sql = """SELECT * FROM mediaserver.usermediaconsumption WHERE username = 'james.smith' AND media_id = 3767;"""
+    dummysql = dictfetchall(cur, sql, )
+    print("return val: ")
+    print(dummysql)
+    
     cur.close()
     conn.close()
     return r
-  except:
-    print("Unexpected error getting User Consumption - Likely no values:", sys.exc_info()[0])
-  
-  cur.close()                     # Close the cursor
-  conn.close()                    # Close the connection to the db
-  return None
 
 
 #####################################################

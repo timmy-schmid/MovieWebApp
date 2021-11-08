@@ -423,7 +423,7 @@ def update_playback_progress():
       print(type(request.form['media_id']))
       print(request.form['progress'])
       print(type(request.form['progress']))
-      status = database.update_user_media_playback(request.form['username'],int(request.form['media_id']),float(request.form['progress']))
+      database.update_user_media_playback(request.form['username'],request.form['media_id'],request.form['progress'])
   
   return "OK"
 #####################################################
@@ -589,10 +589,6 @@ def single_tvshow(tvshow_id):
     Show a single tvshows and its eps in your media server
     Can do this without a login
     """
-    # # Check if the user is logged in, if not: back to login.
-    # if('logged_in' not in session or not session['logged_in']):
-    #     return redirect(url_for('login'))
-
     page['title'] = 'TV Show'
 
     # Get a list of all tvshows by tvshow_id from the database
@@ -625,27 +621,39 @@ def single_tvshowep(tvshowep_id):
     Show a single tvshow episode in your media server
     Can do this without a login
     """
-    # # Check if the user is logged in, if not: back to login.
-    # if('logged_in' not in session or not session['logged_in']):
-    #     return redirect(url_for('login'))
+    
+    if('logged_in' not in session or not session['logged_in']):
+      progress = None
+    else:
+      progress = database.get_user_media_playback(user_details['username'],tvshowep_id)[0]['progress']
+  
 
+    print(progress)
     page['title'] = 'List TV Shows'
 
     # Get a list of all tvshow eps by media_id from the database
     tvshowep = None
     tvshowep = database.get_tvshowep(tvshowep_id)
 
+    location = None
+    location = database.get_media_location(tvshowep_id)[0]['storage_location']
+
 
     # Data integrity checks
     if tvshowep == None:
         tvshowep = []
+    
+    if location == None:
+      location = []
 
 
     return render_template('singleitems/tvshowep.html',
                            session=session,
                            page=page,
                            user=user_details,
-                           tvshowep=tvshowep)
+                           tvshowep=tvshowep,
+                           progress=progress,
+                           location=location)
 
 #####################################################
 #   Query (10)
