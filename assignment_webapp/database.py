@@ -235,12 +235,12 @@ def user_playlists(username):
         # Fill in the SQL below and make sure you get all the playlists for this user #
         ###############################################################################
         sql = """
-SELECT	MC.collection_id, MC.collection_name, count(MC.collection_id)
-FROM	mediaserver.mediacollection MC NATURAL JOIN mediaserver.mediacollectioncontents MCC
-WHERE	MC.username = %s
-GROUP BY MC.collection_id, MC.collection_name
-ORDER BY MC.collection_id;
-        """
+              SELECT	MC.collection_id, MC.collection_name, count(MC.collection_id)
+              FROM	mediaserver.mediacollection MC NATURAL JOIN mediaserver.mediacollectioncontents MCC
+              WHERE	MC.username = %s
+              GROUP BY MC.collection_id, MC.collection_name
+              ORDER BY MC.collection_id;
+              """
 
 
         print("username is: "+username)
@@ -343,6 +343,55 @@ ORDER BY MC.media_id;
     cur.close()                     # Close the cursor
     conn.close()                    # Close the connection to the db
     return None
+
+#gets playback of a media item
+def get_user_media_playback(username,media_id):
+  conn = database_connect()
+  if(conn is None):
+    return None
+  cur = conn.cursor()
+  
+  try:
+    sql = """
+            SELECT	MC.progress
+            FROM	mediaserver.usermediaconsumption MC NATURAL JOIN mediaserver.mediaitem MI
+            WHERE	MC.username = %s AND MC.media_id = %s
+            ORDER BY MC.media_id;
+          """
+    r = dictfetchone(cur,sql,(username,media_id))
+    cur.close()
+    conn.close()
+    return r
+  except:
+    print("Unexpected error getting User Consumption - Likely no values:", sys.exc_info()[0])
+  
+  cur.close()                     # Close the cursor
+  conn.close()                    # Close the connection to the db
+  return None
+
+
+def update_user_media_playback(username,media_id,progress):
+  conn = database_connect()
+  if(conn is None):
+    return None
+  cur = conn.cursor()
+
+  try:
+    sql = """
+            UPDATE mediaserver.usermediaconsumption
+            SET progress = %s
+            WHERE username = %s AND media_id = %s; 
+          """
+    r = dictfetchone(cur,sql,(username,media_id,progress))
+    cur.close()
+    conn.close()
+    return r
+  except:
+    print("Unexpected error getting User Consumption - Likely no values:", sys.exc_info()[0])
+  
+  cur.close()                     # Close the cursor
+  conn.close()                    # Close the connection to the db
+  return None
 
 
 #####################################################
@@ -642,7 +691,7 @@ def get_song(song_id):
         # and the artists that performed it                                         #
         #############################################################################
         sql = """
-SELECT 	S.song_title, S.length, string_agg(SAA.artist_name,', ') as artists
+SELECT 	S.song_id, S.song_title, S.length, string_agg(SAA.artist_name,', ') as artists
 FROM	mediaserver.song S LEFT OUTER JOIN 
 		(mediaserver.Song_Artists SA JOIN mediaserver.Artist ART ON (SA.performing_artist_id=ART.artist_id)) AS SAA 
 		ON (S.song_id=SAA.song_id)
@@ -687,11 +736,14 @@ def get_song_metadata(song_id):
         #############################################################################
 
         sql = """
-SELECT	S.song_title, md_type_name, md_value
-FROM 	(mediaserver.mediaitemmetadata MI JOIN mediaserver.song S ON (MI.media_id = S.song_id))
-		NATURAL JOIN mediaserver.metadatatype NATURAL JOIN mediaserver.metadata
-WHERE	S.song_id = %s;
-        """
+                SELECT	S.song_title, md_type_name, md_value, storage_location
+                FROM mediaserver.mediaitemmetadata MI
+                  JOIN mediaserver.song S ON (MI.media_id = S.song_id)
+                  NATURAL JOIN mediaserver.metadatatype
+                  NATURAL JOIN mediaserver.metadata
+                  NATURAL JOIN mediaserver.mediaitem
+                WHERE	S.song_id = %s;
+                """
 
         r = dictfetchall(cur,sql,(song_id,))
         print("return val is:")

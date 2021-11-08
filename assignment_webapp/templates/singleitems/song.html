@@ -1,9 +1,48 @@
 {% include 'top.html' %}
 <div class="content">
     <div class="container details">
-        <!-- Check if We have a valid song -->
         {% if song | length > 0 %}
             <h2 class="title"> {{song[0].song_title}} by {{song[0].artists}}</h2>
+
+            <!-- Check if We have a valid song -->
+             <audio id="player"
+                controls
+                src="{{songmetadata[0].storage_location}}">
+                Your browser does not support the audio element.
+              </audio>
+            </audio>
+
+            {% if user['username'] | length > 0 %}
+              <script>
+                var audio = document.getElementById('player');
+                audio.onloadedmetadata = function() {
+                  audio.currentTime = audio.duration * {{progress}} / 100;
+                };
+
+                // Create event listener timeupdate
+                document.getElementById('player').addEventListener('pause',updateProgress)
+                
+                function updateProgress() {
+
+                  var currProgress = Math.round(audio.currentTime / audio.duration * 10000) / 100;
+                  var userName = '{{user['username']}}';
+                  var mediaId = '{{song[0].song_id}}';
+
+                  console.log(userName);
+                  console.log(mediaId);
+                  console.log(currProgress);
+                  $.post('/updateplayback', {
+                    username: userName,
+                    media_id: mediaId,
+                    progress: currProgress
+                  }).done(function(response) {
+                    console.log("success");
+                  }).fail(function() {
+                    console.log("fail");
+                 });     
+                }
+              </script>
+            {% endif %}
             <br/>
             Song is {{song[0].length}} seconds long.
             <hr/>
@@ -16,6 +55,7 @@
                 {% endif %}
             {% endfor %}
             <br/>
+
             <h3> Descriptions </h3>
             {% for instance in songmetadata %}
                 {% if instance.md_type_name == 'description' %}

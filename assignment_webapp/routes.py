@@ -372,9 +372,15 @@ def single_song(song_id):
     Show a single song by song_id in your media server
     Can do this without a login
     """
-    # # Check if the user is logged in, if not: back to login.
-    # if('logged_in' not in session or not session['logged_in']):
-    #     return redirect(url_for('login'))
+    # # Check if the user is logged in, if so then update playback
+    if('logged_in' not in session or not session['logged_in']):
+      progress = None
+    else:
+      progress = database.get_user_media_playback(user_details['username'],song_id)[0]['progress']
+
+
+    if progress == None:
+      progress = [] 
 
     page['title'] = 'Song'
 
@@ -397,8 +403,29 @@ def single_song(song_id):
                            page=page,
                            user=user_details,
                            song=song,
-                           songmetadata=songmetadata)
+                           songmetadata=songmetadata,
+                           progress=progress)
 
+#####################################################
+#   EXTRA TASK (11)
+#   UPDATE PLAYBACK
+#####################################################
+@app.route('/updateplayback', methods=['POST'])
+def update_playback_progress():
+
+  if('logged_in' not in session or not session['logged_in']):
+    status = None
+  else:
+    if(request.method == 'POST'):
+      print(request.form['username'])
+      print(type(request.form['username']))
+      print(request.form['media_id'])
+      print(type(request.form['media_id']))
+      print(request.form['progress'])
+      print(type(request.form['progress']))
+      status = database.update_user_media_playback(request.form['username'],int(request.form['media_id']),float(request.form['progress']))
+  
+  return "OK"
 #####################################################
 #   Query (6)
 #   Individual Podcast
