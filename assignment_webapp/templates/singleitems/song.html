@@ -13,7 +13,7 @@
             </audio>
 
             {% if user['username'] | length > 0 %}
-              <script>
+				<script>
                 var audio = document.getElementById('player');
                 audio.onloadedmetadata = function() {
                   audio.currentTime = audio.duration * {{progress}} / 100;

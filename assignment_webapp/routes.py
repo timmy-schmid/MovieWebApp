@@ -378,7 +378,6 @@ def single_song(song_id):
     else:
       progress = database.get_user_media_playback(user_details['username'],song_id)[0]['progress']
 
-
     if progress == None:
       progress = [] 
 
@@ -424,8 +423,10 @@ def update_playback_progress():
       print(request.form['progress'])
       print(type(request.form['progress']))
       status = database.update_user_media_playback(request.form['username'],int(request.form['media_id']),float(request.form['progress']))
-  
+      print("Got Here (1)")  
+      
   return "OK"
+
 #####################################################
 #   Query (6)
 #   Individual Podcast
@@ -443,6 +444,24 @@ def single_podcast(podcast_id):
     #############################################################################
     # Fill in the Function below with to do all data handling for a podcast     #
     #############################################################################
+
+    # Check if the user is logged in, if so then update playback
+    if('logged_in' not in session or not session['logged_in']):
+        progress = None
+        location = None
+    else:
+        progress = database.get_user_media_playback(user_details['username'],podcast_id)
+        location = database.get_media_location(podcast_id)
+    
+    if (progress == None):
+        progress = []
+    else:
+        progress = progress[0]['progress']
+    
+    if (location == None):
+        location = []
+    else:
+        location = location[0]['storage_location']
 
     page['title'] = 'Podcast' # Add the title
 
@@ -467,7 +486,9 @@ def single_podcast(podcast_id):
                            page=page,
                            user=user_details,
                            podcast=podcast,
-                           podcast_eps=podcast_eps)
+                           podcast_eps=podcast_eps,
+                           progress=progress,
+                           location=location)
 
 #####################################################
 #   Query (7)
@@ -487,6 +508,24 @@ def single_podcastep(media_id):
     # Fill in the Function below with to do all data handling for a podcast ep  #
     #############################################################################
 
+    # Check if the user is logged in, if so then update playback
+    if('logged_in' not in session or not session['logged_in']):
+        progress = None
+        location = None
+    else:
+        progress = database.get_user_media_playback(user_details['username'],media_id)
+        location = database.get_media_location(media_id)
+    
+    if (progress == None):
+        progress = []
+    else:
+        progress = progress[0]['progress']
+    
+    if (location == None):
+        location = []
+    else:
+        location = location[0]['storage_location']
+
     page['title'] = 'Podcast Episode' # Add the title
 
     # Set up some variables to manage the returns from the database fucntions
@@ -501,7 +540,9 @@ def single_podcastep(media_id):
                            session=session,
                            page=page,
                            user=user_details,
-                           podcast_eps=podcast_eps)
+                           podcast_eps=podcast_eps,
+                           progress=progress,
+                           location=location)
 
 
 #####################################################

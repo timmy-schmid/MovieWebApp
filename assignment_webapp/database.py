@@ -108,13 +108,21 @@ def dictfetchall(cursor,sqltext,params=None):
         print_sql_string(sqltext,params)
     
     cursor.execute(sqltext,params)
-    cols = [a[0].decode("utf-8") for a in cursor.description]
-    print(cols)
-    returnres = cursor.fetchall()
-    for row in returnres:
-        result.append({a:b for a,b in zip(cols, row)})
-    # cursor.close()
-    return result
+    print("GOT HERE!!")
+    print(cursor.rowcount, "record(s) affected")
+    
+    if (cursor.description != None):
+        cols = [a[0].decode("utf-8") for a in cursor.description]
+        print(cols)
+        
+        returnres = cursor.fetchall()
+        for row in returnres:
+            result.append({a:b for a,b in zip(cols, row)})
+        # cursor.close()
+        return result
+    
+    else:    
+        return cursor.rowcount, "record(s) affected"
 
 def dictfetchone(cursor,sqltext,params=None):
     """ Returns query results as list of dictionaries."""
@@ -353,9 +361,9 @@ def get_user_media_playback(username,media_id):
   
   try:
     sql = """
-            SELECT	MC.progress
-            FROM	mediaserver.usermediaconsumption MC NATURAL JOIN mediaserver.mediaitem MI
-            WHERE	MC.username = %s AND MC.media_id = %s
+            SELECT   MC.progress, MI.storage_location
+            FROM     mediaserver.usermediaconsumption MC NATURAL JOIN mediaserver.mediaitem MI
+            WHERE    MC.username = %s AND MC.media_id = %s
             ORDER BY MC.media_id;
           """
     r = dictfetchone(cur,sql,(username,media_id))
@@ -371,18 +379,49 @@ def get_user_media_playback(username,media_id):
 
 
 def update_user_media_playback(username,media_id,progress):
+    conn = database_connect()
+    if(conn is None):
+        return None
+    cur = conn.cursor()
+
+    try:
+        sql = """
+    UPDATE 	mediaserver.usermediaconsumption
+    SET 	progress = CAST(%s AS DECIMAL), lastviewed = CURRENT_DATE, play_count = play_count + 1
+    WHERE 	username = %s AND media_id = %s;
+              """
+        r = dictfetchall(cur,sql,(progress,username,media_id))
+        print(r)
+        print("Got Here!")
+        
+        conn.commit() # load the changes in the sql
+        
+        cur.close()
+        conn.close()
+        return r
+    except:
+        print("Unexpected error getting User Consumption - Likely no values:", sys.exc_info()[0])
+  
+    cur.close()                     # Close the cursor
+    conn.close()                    # Close the connection to the db
+    return None
+
+#####################################################
+#   HELPER FUNCTION
+#####################################################
+def get_media_location(media_id):
   conn = database_connect()
   if(conn is None):
     return None
   cur = conn.cursor()
-
+  
   try:
     sql = """
-            UPDATE mediaserver.usermediaconsumption
-            SET progress = %s
-            WHERE username = %s AND media_id = %s; 
+            SELECT *
+            FROM mediaserver.mediaitem MI
+            WHERE MI.media_id = %s
           """
-    r = dictfetchone(cur,sql,(username,media_id,progress))
+    r = dictfetchone(cur,sql,(media_id,))
     cur.close()
     conn.close()
     return r
@@ -392,7 +431,6 @@ def update_user_media_playback(username,media_id,progress):
   cur.close()                     # Close the cursor
   conn.close()                    # Close the connection to the db
   return None
-
 
 #####################################################
 #   Get all artists

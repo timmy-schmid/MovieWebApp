@@ -7,10 +7,46 @@
 {% if podcast_eps | length > 0 %}
             <h2 class="title"> {{podcast_eps[0].podcast_episode_title}} ({{podcast_eps[0].media_id}})</h2>
             <hr/>
+			
             <h2> Podcast URI </h2>
-                <div>
-                    <a href="{{podcast_eps[0].podcast_episode_uri}}">{{podcast_eps[0].podcast_episode_uri}}</a>
-                </div>
+			<!-- Check if We have a valid podcast -->
+            <audio id="player"
+                controls
+                src="{{location}}">
+                Your browser does not support the audio element.
+            </audio>
+
+            {% if user['username'] | length > 0 %}
+				<script>
+					var audio = document.getElementById('player');
+					audio.onloadedmetadata = function() {
+					  audio.currentTime = audio.duration * {{progress}} / 100;
+					};
+
+					// Create event listener timeupdate
+					document.getElementById('player').addEventListener('pause',updateProgress)
+					
+					function updateProgress() {
+
+					  var currProgress = Math.round(audio.currentTime / audio.duration * 10000) / 100;
+					  var userName = '{{user['username']}}';
+					  var mediaId = '{{podcast_eps[0].media_id}}';
+
+					  console.log(userName);
+					  console.log(mediaId);
+					  console.log(currProgress);
+					  $.post('/updateplayback', {
+						username: userName,
+						media_id: mediaId,
+						progress: currProgress
+					  }).done(function(response) {
+						console.log("success");
+					  }).fail(function() {
+						console.log("fail");
+					 });     
+					}
+				</script>
+            {% endif %}
         
             <h2>Podcast Episode Published Date</h2>
                 <div>
@@ -20,6 +56,7 @@
                 <div>
                     {{podcast_eps[0].podcast_episode_length}}
                 </div>
+				
             <h3> Artworks </h3>
             {% for instance in podcast_eps %}
                 {% if instance.md_type_name == 'artwork' %}
